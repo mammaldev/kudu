@@ -67,4 +67,22 @@ describe('Kudu.Model', function () {
       expect(test).to.throw(Error, /is required/);
     });
   });
+
+  describe('Base methods', function () {
+
+    let instance;
+
+    beforeEach(function () {
+      instance = new Model({
+        id: 1
+      });
+    });
+
+    describe('#toJSON', function () {
+
+      it('should be called when stringifying an instance', function () {
+        expect(JSON.stringify(instance)).to.be.a('string');
+      });
+    });
+  });
 });
