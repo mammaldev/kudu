@@ -10,6 +10,7 @@
     "jsonschema": "^1.0.0"
   },
   "devDependencies": {
+    "6to5": "^3.5.0",
     "chai": "^1.10.0",
     "mocha": "^2.0.1",
     "express": "^4.0.0"
