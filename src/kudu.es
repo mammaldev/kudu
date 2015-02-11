@@ -1,3 +1,4 @@
+import { Router } from './router';
 import { Model } from './models';
 
 class Kudu {
@@ -6,6 +7,9 @@ class Kudu {
 
     // Keep a reference to the server (usually an Express app)
     this.app = app;
+
+    // Set up router
+    this.router = new Kudu.Router(this);
 
     // Set up app-wide caches
     this.modelsBySingularName = {};
@@ -41,6 +45,7 @@ class Kudu {
   }
 }
 
+Kudu.Router = Router;
 Kudu.Model = Model;
 
 export { Kudu };
