@@ -1,11 +1,22 @@
 import chai from 'chai';
 import { Kudu } from '../src/kudu';
+import { BaseModel } from '../src/models/base';
 
 let expect = chai.expect;
 let Model;
+let EmptyModel;
 
 beforeEach(function () {
-  Model = new Kudu.Model({});
+  EmptyModel = new Kudu.Model({});
+  Model = new Kudu.Model({
+    title: 'Test',
+    properties: {
+      id: {
+        type: 'integer',
+        required: true
+      }
+    }
+  });
 });
 
 describe('Kudu.Model', function () {
@@ -43,6 +54,17 @@ describe('Kudu.Model constructor functions', function () {
 describe('Kudu.Model constructor instances', function () {
 
   it('should be instantiable', function () {
-    expect(new Model({})).to.be.an.instanceOf(Model);
+    expect(new EmptyModel({})).to.be.an.instanceOf(EmptyModel);
+  });
+
+  it('should inherit from the base model', function () {
+    expect(new EmptyModel({})).to.be.an.instanceof(BaseModel);
+  });
+
+  it('should validate instance data against the schema', function () {
+    function test() {
+      return new Model({});
+    }
+    expect(test).to.throw(Error, /is required/);
   });
 });

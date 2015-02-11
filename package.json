@@ -6,7 +6,9 @@
     "test": "npm run compile && mocha lib/test/ -R spec --recursive"
   },
   "main": "lib/src/kudu.js",
-  "dependencies": {},
+  "dependencies": {
+    "jsonschema": "^1.0.0"
+  },
   "devDependencies": {
     "chai": "^1.10.0",
     "mocha": "^2.0.1"
