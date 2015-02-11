@@ -64,4 +64,35 @@ describe('Kudu.Router', function () {
       .expect(400, done);
     });
   });
+
+  describe('generic GET handler', function () {
+
+    it('should return all instances when no ID is present', function ( done ) {
+      request.get('/tests')
+      .expect(200)
+      .end(function ( err, res ) {
+        expect(res.body).to.be.an('array');
+        done();
+      });
+    });
+
+    it('should fail with 404 when a model is not found for the URL', function ( done ) {
+      request.get('/fail')
+      .expect(404, done);
+    });
+
+    it('should return a single instance when an ID is present', function ( done ) {
+      request.get('/tests/1')
+      .expect(200)
+      .end(function ( err, res ) {
+        expect(res.body).to.have.property('id', 1);
+        done();
+      });
+    });
+
+    it('should fail with 404 when no instance is found for the given ID', function ( done ) {
+      request.get('/tests/2')
+      .expect(404, done);
+    });
+  });
 });
