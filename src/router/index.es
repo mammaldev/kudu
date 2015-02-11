@@ -12,6 +12,7 @@ export class Router {
     //   GET /users
     //   GET /users/:userId
     //   PUT /users/:userId
+    //   DELETE /users/:userId
 
     let self = this;
     let express = kudu.app;
@@ -23,6 +24,7 @@ export class Router {
     express.get(specificURL, handleGet); // Get one
     express.get(genericURL, handleGet); // Get all
     express.put(specificURL, handlePut); // Update one
+    express.delete(specificURL, handleDelete); // Delete one
 
     //
     // Utility functions
@@ -116,6 +118,33 @@ export class Router {
       // Save the instance in the database and send it back to the client.
       kudu.db.update(instance)
       .then(() => res.status(200).json(instance))
+      .catch(self.genericErrorHandler.bind(self, req, res));
+    }
+
+    function handleDelete( req, res ) {
+
+      let type = req.params.type;
+      let Model = kudu.getModelByPluralName(type);
+
+      // If there isn't an associated model we can't go any further.
+      if ( !Model ) {
+        return res.status(404).end();
+      }
+
+      // If there is a model we can attempt to instantiate it with the data
+      // provided with the request. If the data is invalid we send back an
+      // error.
+      let instance;
+
+      try {
+        instance = new Model(req.body);
+      } catch ( e ) {
+        return res.status(400).send(e);
+      }
+
+      // Delete the instance in the database and send back an empty response.
+      kudu.db.delete(instance)
+      .then(() => res.status(204).end())
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
   }

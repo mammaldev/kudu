@@ -44,4 +44,15 @@ export class MockAdapter {
       return resolve(model);
     });
   }
+
+  delete( model ) {
+    return new Promise(( resolve, reject ) => {
+
+      if ( model.id === 3 ) {
+        return reject();
+      }
+
+      return resolve();
+    });
+  }
 }

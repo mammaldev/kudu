@@ -137,4 +137,35 @@ describe('Kudu.Router', () => {
       .expect(500, done);
     });
   });
+
+  describe('generic DELETE handler', () => {
+
+    it('should return 204 with no content when given valid data', ( done ) => {
+      request.delete('/tests/1')
+      .send({ id: 2 })
+      .end(( err, res ) => {
+        expect(res.status).to.equal(204);
+        expect(Object.keys(res.body)).to.have.length(0);
+        done();
+      });
+    });
+
+    it('should fail with 404 when a model is not found for the URL', ( done ) => {
+      request.delete('/invalid/1')
+      .send({ id: 2 })
+      .expect(404, done);
+    });
+
+    it('should fail with 400 when a model cannot be instantiated', ( done ) => {
+      request.delete('/tests/1')
+      .send({ id: 'invalid' })
+      .expect(400, done);
+    });
+
+    it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
+      request.delete('/tests/1')
+      .send({ id: 3 })
+      .expect(500, done);
+    });
+  });
 });
