@@ -8,6 +8,20 @@ export class Router {
     config.baseURL = config.baseURL || '';
   }
 
+  // Register a route handler with Express. Takes an HTTP verb and a URL path.
+  handle( verb, path ) {
+
+    // If the router has been configured with a base URL we prepend it to the
+    // path.
+    path = this.config.baseURL + path;
+
+    // Express exposes methods corresponding to HTTP verbs. The router exposes
+    // a single method and expects the verb as an argument. We slice off the
+    // verb and pass the rest of the arguments through.
+    let expressArgs = [].slice.call(arguments, 1);
+    this.kudu.app[ verb.toLowerCase() ].apply(this.kudu.app, expressArgs);
+  }
+
   // Configure generic API routes. URLs are based on pluralised model names.
   // For example an application with a 'User' model will currently accept the
   // following requests by default:

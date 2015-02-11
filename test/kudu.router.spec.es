@@ -22,6 +22,10 @@ beforeEach(() => {
     databaseAdapter: MockAdapter
   });
 
+  app.router.handle('GET', '/handle', ( req, res ) => {
+    res.status(200).end();
+  });
+
   app.router.enableGenericRouteHandlers();
 
   app.createModel('Test', {
@@ -172,6 +176,14 @@ describe('Kudu.Router', () => {
       request.delete('/tests/1')
       .send({ id: 3 })
       .expect(500, done);
+    });
+  });
+
+  describe('#handle', () => {
+
+    it('should set up a route handler on the Express app', ( done ) => {
+      request.get('/handle')
+      .expect(200, done);
     });
   });
 });
