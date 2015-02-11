@@ -35,36 +35,36 @@ describe('Kudu.Model', function () {
   it('should return a constructor function', function () {
     expect(Model).to.be.a('function');
   });
-});
 
-describe('Kudu.Model constructor functions', function () {
+  describe('Constructor functions', function () {
 
-  it('should be an instance of Kudu.Model', function () {
-    expect(Model).to.be.an.instanceOf(Kudu.Model);
+    it('should be an instance of Kudu.Model', function () {
+      expect(Model).to.be.an.instanceOf(Kudu.Model);
+    });
+
+    it('should throw an error if not passed instance data', function () {
+      function test() {
+        return new Model();
+      }
+      expect(test).to.throw(Error, /instance data/);
+    });
   });
 
-  it('should throw an error if not passed instance data', function () {
-    function test() {
-      return new Model();
-    }
-    expect(test).to.throw(Error, /instance data/);
-  });
-});
+  describe('Constructor instances', function () {
 
-describe('Kudu.Model constructor instances', function () {
+    it('should be instantiable', function () {
+      expect(new EmptyModel({})).to.be.an.instanceOf(EmptyModel);
+    });
 
-  it('should be instantiable', function () {
-    expect(new EmptyModel({})).to.be.an.instanceOf(EmptyModel);
-  });
+    it('should inherit from the base model', function () {
+      expect(new EmptyModel({})).to.be.an.instanceof(BaseModel);
+    });
 
-  it('should inherit from the base model', function () {
-    expect(new EmptyModel({})).to.be.an.instanceof(BaseModel);
-  });
-
-  it('should validate instance data against the schema', function () {
-    function test() {
-      return new Model({});
-    }
-    expect(test).to.throw(Error, /is required/);
+    it('should validate instance data against the schema', function () {
+      function test() {
+        return new Model({});
+      }
+      expect(test).to.throw(Error, /is required/);
+    });
   });
 });
