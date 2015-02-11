@@ -43,7 +43,7 @@ describe('Kudu.Router', function () {
   describe('generic POST handler', function () {
 
     it('should return a serialized model instance when given valid data', function ( done ) {
-      request.post('/test')
+      request.post('/tests')
       .send({ id: 1 })
       .expect(201)
       .end(( err, res ) => {
@@ -59,13 +59,13 @@ describe('Kudu.Router', function () {
     });
 
     it('should fail with 400 when a model cannot be instantiated', function ( done ) {
-      request.post('/test')
+      request.post('/tests')
       .send({ id: 'invalid' })
       .expect(400, done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', function ( done ) {
-      request.post('/test')
+      request.post('/tests')
       .send({ id: 2 })
       .expect(500, done);
     });

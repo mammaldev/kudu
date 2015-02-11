@@ -4,7 +4,14 @@ export class Router {
 
     this.kudu = kudu;
 
-    // Configure generic API routes.
+    // Configure generic API routes. URLs are based on pluralised model names.
+    // For example an application with a 'User' model will currently accept the
+    // following requests by default:
+    //
+    //   POST /users
+    //   GET /users
+    //   GET /users/:userId
+
     let self = this;
     let express = kudu.app;
     let base = config.baseURL || '';
@@ -22,7 +29,7 @@ export class Router {
     function handlePost( req, res ) {
 
       let type = req.params.type;
-      let Model = kudu.getModel(type);
+      let Model = kudu.getModelByPluralName(type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
