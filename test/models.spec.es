@@ -5,13 +5,20 @@ let expect = chai.expect;
 let Model;
 
 beforeEach(function () {
-  Model = new Kudu.Model();
+  Model = new Kudu.Model({});
 });
 
 describe('Kudu.Model', function () {
 
   it('should be a static method on Kudu', function () {
     expect(Kudu.Model).to.exist();
+  });
+
+  it('should throw an error if not passed a schema object', function () {
+    function test() {
+      return new Kudu.Model();
+    }
+    expect(test).to.throw(Error, /schema/);
   });
 
   it('should return a constructor function', function () {

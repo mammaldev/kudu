@@ -2,7 +2,11 @@ import { BaseModel } from './base';
 
 export class Model {
 
-  constructor() {
+  constructor( schema ) {
+
+    if ( typeof schema !== 'object' ) {
+      throw new Error('No schema provided.');
+    }
 
     class Constructor extends BaseModel {
 
