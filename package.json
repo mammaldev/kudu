@@ -2,7 +2,7 @@
   "name": "kudu",
   "version": "0.1.0",
   "scripts": {
-    "compile": "6to5 -d lib/ src/**/*.es src/*.es test/*.es",
+    "compile": "6to5 -d lib/ src/**/*.es src/*.es test/**/*.es test/*.es",
     "test": "npm run compile && mocha lib/test/ -R spec --recursive"
   },
   "main": "lib/src/kudu.js",
@@ -13,6 +13,8 @@
     "6to5": "^3.5.0",
     "chai": "^1.10.0",
     "mocha": "^2.0.1",
-    "express": "^4.0.0"
+    "express": "^4.0.0",
+    "supertest": "^0.15.0",
+    "body-parser": "^1.10.0"
   }
 }
