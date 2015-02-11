@@ -36,10 +36,14 @@ class Kudu {
     return Constructor;
   }
 
+  // Retrieve a model constructor from the app-wide cache of models. Takes the
+  // name (case-insensitive string) of a model.
   getModel( name ) {
     return this.modelsBySingularName[ name.toLowerCase() ];
   }
 
+  // Retrieve a model constructor from the app-wide cache of models. Takes the
+  // pluralised name (case-insensitive string) of a model.
   getModelByPluralName( name ) {
     return this.modelsByPluralName[ name.toLowerCase() ];
   }
