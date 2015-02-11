@@ -5,6 +5,7 @@ export class Router {
     this.kudu = kudu;
 
     // Configure generic API routes.
+    let self = this;
     let express = kudu.app;
     let base = config.baseURL || '';
     let genericURL = base + '/:type';
@@ -42,7 +43,7 @@ export class Router {
       // Save the instance in the database and send it back to the client.
       kudu.db.create(instance)
       .then(() => res.status(201).json(instance))
-      .catch(() => res.status(500).end());
+      .catch(self.genericErrorHandler.bind(self, req, res));
     }
 
     function handleGet( req, res ) {
@@ -69,7 +70,7 @@ export class Router {
           let instance = new Model(data);
           return res.status(200).json(instance);
         })
-        .catch(() => res.status(500).end());
+        .catch(self.genericErrorHandler.bind(self, req, res));
       }
 
       // If no identifier is present we need all instances
@@ -79,7 +80,11 @@ export class Router {
         let instances = data.map(( item ) => new Model(item));
         res.status(200).json(instances);
       })
-      .catch(() => res.status(500).end());
+      .catch(self.genericErrorHandler.bind(self, req, res));
     }
+  }
+
+  genericErrorHandler( req, res ) {
+    return res.status(500).end();
   }
 }

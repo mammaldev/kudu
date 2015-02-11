@@ -63,6 +63,12 @@ describe('Kudu.Router', function () {
       .send({ id: 'invalid' })
       .expect(400, done);
     });
+
+    it('should fail with 500 when the database adapter throws/rejects', function ( done ) {
+      request.post('/test')
+      .send({ id: 2 })
+      .expect(500, done);
+    });
   });
 
   describe('generic GET handler', function () {
@@ -93,6 +99,11 @@ describe('Kudu.Router', function () {
     it('should fail with 404 when no instance is found for the given ID', function ( done ) {
       request.get('/tests/2')
       .expect(404, done);
+    });
+
+    it('should fail with 500 when the database adapter throws/rejects', function ( done ) {
+      request.get('/tests/3')
+      .expect(500, done);
     });
   });
 });

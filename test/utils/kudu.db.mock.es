@@ -5,14 +5,25 @@ export class MockAdapter {
   }
 
   create( model ) {
-    return new Promise(( resolve ) => resolve(model));
+    return new Promise(( resolve, reject ) => {
+
+      if ( model.id === 2 ) {
+        return reject();
+      }
+
+      return resolve(model);
+    });
   }
 
   get( id ) {
-    return new Promise(function ( resolve ) {
+    return new Promise(( resolve, reject ) => {
 
       if ( id === '2' ) {
         return resolve(null);
+      }
+
+      if ( id === '3' ) {
+        return reject();
       }
 
       return resolve({ id: 1 });
