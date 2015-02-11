@@ -3,22 +3,32 @@ export class Router {
   constructor( kudu, config = {} ) {
 
     this.kudu = kudu;
+    this.config = config;
 
-    // Configure generic API routes. URLs are based on pluralised model names.
-    // For example an application with a 'User' model will currently accept the
-    // following requests by default:
-    //
-    //   POST /users
-    //   GET /users
-    //   GET /users/:userId
-    //   PUT /users/:userId
-    //   DELETE /users/:userId
+    config.baseURL = config.baseURL || '';
+  }
+
+  // Configure generic API routes. URLs are based on pluralised model names.
+  // For example an application with a 'User' model will currently accept the
+  // following requests by default:
+  //
+  //   POST /users
+  //   GET /users
+  //   GET /users/:userId
+  //   PUT /users/:userId
+  //   DELETE /users/:userId
+  //
+  // This method should be called after any custom route handlers have been
+  // configured because the URLs its uses are highly generic and would be
+  // likely to match many more requests than intended.
+  enableGenericRouteHandlers() {
 
     let self = this;
-    let express = kudu.app;
-    let base = config.baseURL || '';
-    let genericURL = base + '/:type';
+    let kudu = this.kudu;
+    let base = this.config.baseURL || '';
     let specificURL = base + '/:type/:id';
+    let genericURL = base + '/:type';
+    let express = this.kudu.app;
 
     express.post(genericURL, handlePost); // Create
     express.get(specificURL, handleGet); // Get one

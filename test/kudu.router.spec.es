@@ -22,6 +22,8 @@ beforeEach(() => {
     databaseAdapter: MockAdapter
   });
 
+  app.router.enableGenericRouteHandlers();
+
   app.createModel('Test', {
     properties: {
       id: {
@@ -38,6 +40,10 @@ describe('Kudu.Router', () => {
 
   it('should be a constructor function exposed on Kudu', () => {
     expect(Kudu.Router).to.be.a('function');
+  });
+
+  it('should be instantiated and exposed on Kudu instances', () => {
+    expect(app.router).to.be.an.instanceOf(Kudu.Router);
   });
 
   describe('generic POST handler', () => {
