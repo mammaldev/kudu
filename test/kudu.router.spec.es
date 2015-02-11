@@ -106,4 +106,35 @@ describe('Kudu.Router', () => {
       .expect(500, done);
     });
   });
+
+  describe('generic PUT handler', () => {
+
+    it('should return a serialized model instance when given valid data', ( done ) => {
+      request.put('/tests/1')
+      .send({ id: 2 })
+      .end(( err, res ) => {
+        expect(res.status).to.equal(200);
+        expect(res.body).to.have.property('id', 2);
+        done();
+      });
+    });
+
+    it('should fail with 404 when a model is not found for the URL', ( done ) => {
+      request.put('/invalid/1')
+      .send({ id: 2 })
+      .expect(404, done);
+    });
+
+    it('should fail with 400 when a model cannot be instantiated', ( done ) => {
+      request.put('/tests/1')
+      .send({ id: 'invalid' })
+      .expect(400, done);
+    });
+
+    it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
+      request.put('/tests/1')
+      .send({ id: 3 })
+      .expect(500, done);
+    });
+  });
 });

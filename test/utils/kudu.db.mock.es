@@ -33,4 +33,15 @@ export class MockAdapter {
   getAll() {
     return new Promise(( resolve ) => resolve([ { id: 1 } ]));
   }
+
+  update( model ) {
+    return new Promise(( resolve, reject) => {
+
+      if ( model.id === 3 ) {
+        return reject();
+      }
+
+      return resolve(model);
+    });
+  }
 }
