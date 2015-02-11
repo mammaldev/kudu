@@ -4,6 +4,8 @@ export class Model {
 
   constructor( schema ) {
 
+    // Ensure a schema is present. We can't create instances without something
+    // to validate them against.
     if ( typeof schema !== 'object' ) {
       throw new Error('No schema provided.');
     }
@@ -22,6 +24,7 @@ export class Model {
       }
     }
 
+    // Set up inheritance. Returned constructors will be instance of Kudu.Model.
     Object.setPrototypeOf(Constructor, Model.prototype);
 
     return Constructor;
