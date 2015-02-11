@@ -3,10 +3,15 @@ import { Model } from './models';
 
 class Kudu {
 
-  constructor( app ) {
+  constructor( app, config = {} ) {
 
     // Keep a reference to the server (usually an Express app)
     this.app = app;
+
+    // Set up database adapter
+    if ( typeof config.databaseAdapter === 'function' ) {
+      this.db = new config.databaseAdapter(this, config.database);
+    }
 
     // Set up router
     this.router = new Kudu.Router(this);
@@ -51,5 +56,6 @@ class Kudu {
 
 Kudu.Router = Router;
 Kudu.Model = Model;
+Kudu.DB = {};
 
 export { Kudu };
