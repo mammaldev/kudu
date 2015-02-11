@@ -6,7 +6,7 @@ let expect = chai.expect;
 let Model;
 let EmptyModel;
 
-beforeEach(function () {
+beforeEach(() => {
   EmptyModel = new Kudu.Model({});
   Model = new Kudu.Model({
     title: 'Test',
@@ -19,30 +19,30 @@ beforeEach(function () {
   });
 });
 
-describe('Kudu.Model', function () {
+describe('Kudu.Model', () => {
 
-  it('should be a static method on Kudu', function () {
+  it('should be a static method on Kudu', () => {
     expect(Kudu.Model).to.exist();
   });
 
-  it('should throw an error if not passed a schema object', function () {
+  it('should throw an error if not passed a schema object', () => {
     function test() {
       return new Kudu.Model();
     }
     expect(test).to.throw(Error, /schema/);
   });
 
-  it('should return a constructor function', function () {
+  it('should return a constructor function', () => {
     expect(Model).to.be.a('function');
   });
 
-  describe('Constructor functions', function () {
+  describe('Constructor functions', () => {
 
-    it('should be an instance of Kudu.Model', function () {
+    it('should be an instance of Kudu.Model', () => {
       expect(Model).to.be.an.instanceOf(Kudu.Model);
     });
 
-    it('should throw an error if not passed instance data', function () {
+    it('should throw an error if not passed instance data', () => {
       function test() {
         return new Model();
       }
@@ -50,17 +50,17 @@ describe('Kudu.Model', function () {
     });
   });
 
-  describe('Constructor instances', function () {
+  describe('Constructor instances', () => {
 
-    it('should be instantiable', function () {
+    it('should be instantiable', () => {
       expect(new EmptyModel({})).to.be.an.instanceOf(EmptyModel);
     });
 
-    it('should inherit from the base model', function () {
+    it('should inherit from the base model', () => {
       expect(new EmptyModel({})).to.be.an.instanceof(BaseModel);
     });
 
-    it('should validate instance data against the schema', function () {
+    it('should validate instance data against the schema', () => {
       function test() {
         return new Model({});
       }
@@ -68,19 +68,19 @@ describe('Kudu.Model', function () {
     });
   });
 
-  describe('Base methods', function () {
+  describe('Base methods', () => {
 
     let instance;
 
-    beforeEach(function () {
+    beforeEach(() => {
       instance = new Model({
         id: 1
       });
     });
 
-    describe('#toJSON', function () {
+    describe('#toJSON', () => {
 
-      it('should be called when stringifying an instance', function () {
+      it('should be called when stringifying an instance', () => {
         expect(JSON.stringify(instance)).to.be.a('string');
       });
     });

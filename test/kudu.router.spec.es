@@ -13,7 +13,7 @@ let expressApp;
 let request;
 let app;
 
-beforeEach(function () {
+beforeEach(() => {
 
   expressApp = express();
   expressApp.use(json());
@@ -34,15 +34,15 @@ beforeEach(function () {
   request = supertest(expressApp);
 });
 
-describe('Kudu.Router', function () {
+describe('Kudu.Router', () => {
 
-  it('should be a constructor function exposed on Kudu', function () {
+  it('should be a constructor function exposed on Kudu', () => {
     expect(Kudu.Router).to.be.a('function');
   });
 
-  describe('generic POST handler', function () {
+  describe('generic POST handler', () => {
 
-    it('should return a serialized model instance when given valid data', function ( done ) {
+    it('should return a serialized model instance when given valid data', ( done ) => {
       request.post('/tests')
       .send({ id: 1 })
       .expect(201)
@@ -52,56 +52,56 @@ describe('Kudu.Router', function () {
       });
     });
 
-    it('should fail with 404 when a model is not found for the URL', function ( done ) {
+    it('should fail with 404 when a model is not found for the URL', ( done ) => {
       request.post('/invalid')
       .send({ id: 1 })
       .expect(404, done);
     });
 
-    it('should fail with 400 when a model cannot be instantiated', function ( done ) {
+    it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.post('/tests')
       .send({ id: 'invalid' })
       .expect(400, done);
     });
 
-    it('should fail with 500 when the database adapter throws/rejects', function ( done ) {
+    it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
       request.post('/tests')
       .send({ id: 2 })
       .expect(500, done);
     });
   });
 
-  describe('generic GET handler', function () {
+  describe('generic GET handler', () => {
 
-    it('should return all instances when no ID is present', function ( done ) {
+    it('should return all instances when no ID is present', ( done ) => {
       request.get('/tests')
       .expect(200)
-      .end(function ( err, res ) {
+      .end(( err, res ) => {
         expect(res.body).to.be.an('array');
         done();
       });
     });
 
-    it('should fail with 404 when a model is not found for the URL', function ( done ) {
+    it('should fail with 404 when a model is not found for the URL', ( done ) => {
       request.get('/fail')
       .expect(404, done);
     });
 
-    it('should return a single instance when an ID is present', function ( done ) {
+    it('should return a single instance when an ID is present', ( done ) => {
       request.get('/tests/1')
       .expect(200)
-      .end(function ( err, res ) {
+      .end(( err, res ) => {
         expect(res.body).to.have.property('id', 1);
         done();
       });
     });
 
-    it('should fail with 404 when no instance is found for the given ID', function ( done ) {
+    it('should fail with 404 when no instance is found for the given ID', ( done ) => {
       request.get('/tests/2')
       .expect(404, done);
     });
 
-    it('should fail with 500 when the database adapter throws/rejects', function ( done ) {
+    it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
       request.get('/tests/3')
       .expect(500, done);
     });
