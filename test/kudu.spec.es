@@ -27,9 +27,9 @@ describe('Kudu', () => {
       expect(app.createModel).to.be.a('function');
     });
 
-    it('should return a Kudu.Model instance', () => {
-      var Model = app.createModel('Test', {});
-      expect(Model).to.be.an.instanceOf(Kudu.Model);
+    it('should return a model constructor function', () => {
+      let Model = app.createModel('Test', {});
+      expect(Model).to.be.a('function');
     });
   });
 
@@ -37,14 +37,14 @@ describe('Kudu', () => {
 
     it('should allow retreival of model constructors by name', () => {
       app.createModel('Test', {});
-      var Model = app.getModel('Test');
-      expect(Model).to.be.an.instanceOf(Kudu.Model);
+      let Model = app.getModel('Test');
+      expect(Model).to.be.a('function');
     });
 
     it('should be case-insensitive', () => {
       app.createModel('Test', {});
-      var Model = app.getModel('test');
-      expect(Model).to.be.an.instanceOf(Kudu.Model);
+      let Model = app.getModel('test');
+      expect(Model).to.be.a('function');
     });
   });
 });

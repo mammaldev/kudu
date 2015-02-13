@@ -5,9 +5,12 @@ import { BaseModel } from '../src/models/base';
 let expect = chai.expect;
 let Model;
 let EmptyModel;
+let InheritedModel;
 
 beforeEach(() => {
+
   EmptyModel = new Kudu.Model({});
+
   Model = new Kudu.Model({
     title: 'Test',
     properties: {
@@ -17,6 +20,17 @@ beforeEach(() => {
       }
     }
   });
+  Model.prototype.someMethod = () => 1;
+
+  InheritedModel = new Kudu.Model(Model, {
+    properties: {
+      additional: {
+        type: 'string',
+        required: true
+      }
+    }
+  });
+  InheritedModel.prototype.anotherMethod = () => 2;
 });
 
 describe('Kudu.Model', () => {
@@ -37,10 +51,6 @@ describe('Kudu.Model', () => {
   });
 
   describe('Constructor functions', () => {
-
-    it('should be an instance of Kudu.Model', () => {
-      expect(Model).to.be.an.instanceOf(Kudu.Model);
-    });
 
     it('should throw an error if not passed instance data', () => {
       function test() {
@@ -65,6 +75,36 @@ describe('Kudu.Model', () => {
         return new Model({});
       }
       expect(test).to.throw(Error, /is required/);
+    });
+  });
+
+  describe('Extended instances', () => {
+
+    it('should inherit properties from the parent model', () => {
+      expect(new InheritedModel({
+        id: 1,
+        additional: '1'
+      })).to.have.property('id', 1);
+    });
+
+    it('should obey the schema for inherited properties', () => {
+      let test = () => new InheritedModel({ additional: '1' });
+      expect(test).to.throw(Error, /is required/);
+    });
+
+    it('should obey the schema for own properties', () => {
+      let test = () => new InheritedModel({ id: 1 });
+      expect(test).to.throw(Error, /is required/);
+    });
+
+    it('should have access to its own methods', () => {
+      let instance = new InheritedModel({ id: 1, additional: '1' });
+      expect(instance).to.have.deep.property('anotherMethod');
+    });
+
+    it('should have access to methods from the parent', () => {
+      let instance = new InheritedModel({ id: 1, additional: '1' });
+      expect(instance).to.have.deep.property('someMethod');
     });
   });
 
