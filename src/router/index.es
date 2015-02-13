@@ -1,11 +1,17 @@
+let defaults = Symbol();
+
 export class Router {
 
-  constructor( kudu, config = {} ) {
+  get [ defaults ]() {
+    return {
+      baseURL: ''
+    };
+  }
+
+  constructor( kudu, config ) {
 
     this.kudu = kudu;
-    this.config = config;
-
-    config.baseURL = config.baseURL || '';
+    this.config = Object.assign({}, this[ defaults ], config);
   }
 
   // Register a route handler with Express. Takes an HTTP verb and a URL path.
