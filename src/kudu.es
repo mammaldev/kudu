@@ -1,3 +1,5 @@
+import 'core-js/shim';
+
 import { Router } from './router';
 import { Model } from './models';
 
