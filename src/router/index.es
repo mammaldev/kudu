@@ -1,6 +1,6 @@
 let defaults = Symbol();
 
-export class Router {
+export default class Router {
 
   get [ defaults ]() {
     return {

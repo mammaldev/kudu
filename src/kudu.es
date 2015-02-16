@@ -1,10 +1,18 @@
 import 'core-js/shim';
 
-import { Router } from './router';
-import { Model } from './models';
-import { BaseModel } from './models/base';
+import Router from './router';
+import Model from './models';
+import BaseModel from './models/base';
 
-class Kudu {
+export default class Kudu {
+
+  static get Router() {
+    return Router;
+  }
+
+  static get Model() {
+    return Model;
+  }
 
   constructor( app, config = {} ) {
 
@@ -60,9 +68,3 @@ class Kudu {
     return this.modelsByPluralName[ name.toLowerCase() ];
   }
 }
-
-Kudu.Router = Router;
-Kudu.Model = Model;
-Kudu.DB = {};
-
-export { Kudu };

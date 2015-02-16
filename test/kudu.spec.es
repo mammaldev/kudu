@@ -2,7 +2,7 @@ import sinonChai from 'sinon-chai';
 import chai from 'chai';
 import express from 'express';
 
-import { Kudu } from '../src/kudu';
+import Kudu from '../src/kudu';
 
 chai.use(sinonChai);
 

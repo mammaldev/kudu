@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { Kudu } from '../src/kudu';
-import { BaseModel } from '../src/models/base';
+import Kudu from '../src/kudu';
+import BaseModel from '../src/models/base';
 
 let expect = chai.expect;
 let Model;

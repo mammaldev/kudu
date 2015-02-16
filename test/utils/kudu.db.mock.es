@@ -1,4 +1,4 @@
-export class MockAdapter {
+export default class MockAdapter {
 
   constructor( kudu ) {
     this.kudu = kudu;

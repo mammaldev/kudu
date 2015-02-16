@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
-import { BaseModel } from './base';
+import BaseModel from './base';
 
-export class Model {
+export default class Model {
 
   constructor( ToExtend, schema ) {
 

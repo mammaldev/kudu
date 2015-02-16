@@ -1,6 +1,6 @@
 import { validate } from 'jsonschema';
 
-export class BaseModel {
+export default class BaseModel {
 
   constructor( data ) {
 

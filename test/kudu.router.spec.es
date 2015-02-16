@@ -5,8 +5,8 @@ import supertest from 'supertest';
 import express from 'express';
 import chai from 'chai';
 
-import { MockAdapter } from './utils/kudu.db.mock';
-import { Kudu } from '../src/kudu';
+import MockAdapter from './utils/kudu.db.mock';
+import Kudu from '../src/kudu';
 
 let expect = chai.expect;
 let expressApp;
