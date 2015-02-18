@@ -88,7 +88,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.post('/tests')
       .send({ id: 'invalid' })
-      .expect(400, done);
+      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
@@ -163,7 +163,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.put('/tests/1')
       .send({ id: 'invalid' })
-      .expect(400, done);
+      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
@@ -194,7 +194,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.delete('/tests/1')
       .send({ id: 'invalid' })
-      .expect(400, done);
+      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {

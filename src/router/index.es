@@ -80,7 +80,7 @@ export default class Router {
       try {
         instance = new Model(req.body);
       } catch ( e ) {
-        return res.status(400).send(e);
+        return res.status(400).send(e.toString());
       }
 
       // Save the instance in the database and send it back to the client.
@@ -144,7 +144,7 @@ export default class Router {
       try {
         instance = new Model(req.body);
       } catch ( e ) {
-        return res.status(400).send(e);
+        return res.status(400).send(e.toString());
       }
 
       // Save the instance in the database and send it back to the client.
@@ -171,7 +171,7 @@ export default class Router {
       try {
         instance = new Model(req.body);
       } catch ( e ) {
-        return res.status(400).send(e);
+        return res.status(400).send(e.toString());
       }
 
       // Delete the instance in the database and send back an empty response.
