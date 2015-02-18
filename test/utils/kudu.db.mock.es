@@ -1,43 +1,43 @@
 export default class MockAdapter {
 
-  constructor( kudu ) {
-    this.kudu = kudu;
+  constructor() {
+    this.cache = {};
   }
 
   create( model ) {
     return new Promise(( resolve, reject ) => {
 
-      if ( model.id === 2 ) {
+      if ( model.id === 0 ) {
         return reject();
       }
+
+      this.cache[ model.type ] = this.cache[ model.type ] || [];
+      this.cache[ model.type ].push(model);
 
       return resolve(model);
     });
   }
 
-  get( id ) {
+  get( type, id ) {
     return new Promise(( resolve, reject ) => {
 
-      if ( id === '2' ) {
-        return resolve(null);
-      }
-
-      if ( id === '3' ) {
+      if ( id === 'throw' ) {
         return reject();
       }
 
-      return resolve({ id: 1 });
+      let instance = this.cache[ type ].filter(( m ) => m.id === +id)[ 0 ];
+      return resolve(instance || null);
     });
   }
 
-  getAll() {
-    return new Promise(( resolve ) => resolve([ { id: 1 } ]));
+  getAll( type ) {
+    return new Promise(( resolve ) => resolve(this.cache[ type ]));
   }
 
   update( model ) {
     return new Promise(( resolve, reject) => {
 
-      if ( model.id === 3 ) {
+      if ( model.id === 0 ) {
         return reject();
       }
 
@@ -48,7 +48,7 @@ export default class MockAdapter {
   delete( model ) {
     return new Promise(( resolve, reject ) => {
 
-      if ( model.id === 3 ) {
+      if ( model.id === 0 ) {
         return reject();
       }
 

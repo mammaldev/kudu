@@ -101,7 +101,7 @@ export default class Router {
       let id = req.params.id;
 
       if ( id ) {
-        return kudu.db.get(id)
+        return kudu.db.get(type, id)
         .then(( data ) => {
 
           if ( !data ) {

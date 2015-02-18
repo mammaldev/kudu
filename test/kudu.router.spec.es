@@ -76,18 +76,26 @@ describe('Kudu.Router', () => {
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
       request.post('/tests')
-      .send({ id: 2 })
+      .send({ id: 0 })
       .expect(500, done);
     });
   });
 
   describe('generic GET handler', () => {
 
+    beforeEach(( done ) => {
+      Promise.all([
+        app.db.create({ type: 'tests', id: 1 }),
+        app.db.create({ type: 'tests', id: 2 })
+      ])
+      .then(() => done());
+    });
+
     it('should return all instances when no ID is present', ( done ) => {
       request.get('/tests')
       .expect(200)
       .end(( err, res ) => {
-        expect(res.body).to.be.an('array');
+        expect(res.body).to.be.an('array').with.property('length', 2);
         done();
       });
     });
@@ -107,12 +115,12 @@ describe('Kudu.Router', () => {
     });
 
     it('should fail with 404 when no instance is found for the given ID', ( done ) => {
-      request.get('/tests/2')
+      request.get('/tests/3')
       .expect(404, done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
-      request.get('/tests/3')
+      request.get('/tests/throw')
       .expect(500, done);
     });
   });
@@ -143,7 +151,7 @@ describe('Kudu.Router', () => {
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
       request.put('/tests/1')
-      .send({ id: 3 })
+      .send({ id: 0 })
       .expect(500, done);
     });
   });
@@ -174,7 +182,7 @@ describe('Kudu.Router', () => {
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
       request.delete('/tests/1')
-      .send({ id: 3 })
+      .send({ id: 0 })
       .expect(500, done);
     });
   });
