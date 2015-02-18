@@ -21,6 +21,10 @@ beforeEach(() => {
       hidden: {
         type: 'integer',
         public: false
+      },
+      defaults: {
+        type: 'string',
+        default: 'default'
       }
     }
   });
@@ -79,6 +83,17 @@ describe('Kudu.Model', () => {
         return new Model({});
       }
       expect(test).to.throw(Error, /is required/);
+    });
+
+    it('should receive default values for missing properties', () => {
+      expect(new Model({ id: 1 })).to.have.property('defaults', 'default');
+    });
+
+    it('should not use default values when property is present', () => {
+      expect(new Model({
+        id: 1,
+        defaults: 'present'
+      })).to.have.property('defaults', 'present');
     });
   });
 
