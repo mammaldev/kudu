@@ -8,7 +8,7 @@ export default class Router {
     };
   }
 
-  constructor( kudu, config ) {
+  constructor( kudu, config = {} ) {
 
     this.kudu = kudu;
     this.config = Object.assign({}, this[ defaults ], config);
@@ -23,8 +23,10 @@ export default class Router {
 
     // Express exposes methods corresponding to HTTP verbs. The router exposes
     // a single method and expects the verb as an argument. We slice off the
-    // verb and pass the rest of the arguments through.
-    let expressArgs = [].slice.call(arguments, 1);
+    // verb and path pass the rest of the arguments through.
+    let expressArgs = [].slice.call(arguments, 2);
+    expressArgs.unshift(path);
+
     this.kudu.app[ verb.toLowerCase() ].apply(this.kudu.app, expressArgs);
   }
 

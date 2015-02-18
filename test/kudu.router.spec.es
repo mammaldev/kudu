@@ -50,6 +50,23 @@ describe('Kudu.Router', () => {
     expect(app.router).to.be.an.instanceOf(Kudu.Router);
   });
 
+  it('should prepend a given base path to each URL', ( done ) => {
+
+    let expressApp = express();
+    let app = new Kudu(expressApp, {
+      databaseAdapter: MockAdapter,
+      router: {
+        baseURL: '/api'
+      }
+    });
+    let request = supertest(expressApp);
+
+    app.router.handle('GET', '/handle', ( req, res ) => res.status(200).end());
+
+    request.get('/api/handle')
+    .expect(200, done);
+  });
+
   describe('generic POST handler', () => {
 
     it('should return a serialized model instance when given valid data', ( done ) => {

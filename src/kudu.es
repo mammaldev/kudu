@@ -25,7 +25,7 @@ export default class Kudu {
     }
 
     // Set up router
-    this.router = new Kudu.Router(this);
+    this.router = new Kudu.Router(this, config.router);
 
     // Set up app-wide caches
     this.modelsBySingularName = {};
