@@ -41,15 +41,23 @@ export default class Kudu {
     // Plural name is optional. If present it should be a string. If missing it
     // will default to the singular name with 's' appended.
     if ( typeof plural === 'object' ) {
+      parent = schema;
       schema = plural;
       plural = singular + 's';
     }
 
+    let Constructor;
+
+    // If the model inherits from another we get the parent constructor and
+    // pass it through to Kudu.Model. The Kudu.Model constructor is overloaded
+    // hence the separate invocations.
     if ( typeof parent === 'string' ) {
       parent = this.getModel(parent);
+      Constructor = new Kudu.Model(parent, schema);
+    } else {
+      Constructor = new Kudu.Model(schema);
     }
 
-    let Constructor = new Kudu.Model(schema, parent);
     this.modelsBySingularName[ singular.toLowerCase() ] = Constructor;
     this.modelsByPluralName[ plural.toLowerCase() ] = Constructor;
 

@@ -31,6 +31,18 @@ describe('Kudu', () => {
       let Model = app.createModel('Test', {});
       expect(Model).to.be.a('function');
     });
+
+    it('should accept both singular and plural names', () => {
+      let Model = app.createModel('person', 'people', {});
+      expect(Model).to.be.a('function');
+    });
+
+    it('should accept a parent model by singular name', () => {
+      let Parent = app.createModel('parent', {});
+      let Child = app.createModel('child', {}, 'parent');
+      let child = new Child({});
+      expect(child).to.be.an.instanceOf(Parent);
+    });
   });
 
   describe('#getModel', () => {
