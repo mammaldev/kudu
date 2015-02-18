@@ -47,6 +47,12 @@ export default class Router {
 
     let self = this;
     let kudu = this.kudu;
+
+    if ( !kudu.hasOwnProperty('db') ) {
+      throw new Error('Generic route handlers cannot be enabled for an ' +
+       'application that does not have a database adapter configured.');
+    }
+
     let base = this.config.baseURL || '';
     let specificURL = base + '/:type/:id';
     let genericURL = base + '/:type';

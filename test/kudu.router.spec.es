@@ -67,6 +67,19 @@ describe('Kudu.Router', () => {
     .expect(200, done);
   });
 
+  describe('#enableGenericRouteHandlers', () => {
+
+    it('should throw an error if no database is configured', () => {
+
+      let expressApp = express();
+      let app = new Kudu(expressApp);
+
+      let test = () => app.router.enableGenericRouteHandlers();
+
+      expect(test).to.throw(/cannot be enabled/);
+    });
+  });
+
   describe('generic POST handler', () => {
 
     it('should return a serialized model instance when given valid data', ( done ) => {
