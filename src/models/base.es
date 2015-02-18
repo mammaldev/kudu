@@ -38,19 +38,22 @@ export default class BaseModel {
     Object.keys(data).forEach(( k ) => this[ k ] = result.instance[ k ]);
   }
 
-  toJSON() {
+  toJSON( unsafe = false ) {
 
-    // Remove non-public properties from a copy of the instance. This is useful
-    // for e.g. password hash fields on a user model which should never be sent
-    // to the client.
     let properties = this.constructor.schema.properties;
     let copy = Object.assign({}, this);
 
-    Object.keys(properties).forEach(( key ) => {
-      if ( properties[ key ].public === false ) {
-        delete copy[ key ];
-      }
-    });
+    // Remove non-public properties from a copy of the instance. This is useful
+    // for e.g. password hash fields on a user model which should never be sent
+    // to the client. Unsafe mode will result in all properties being present
+    // in the serialized instance.
+    if ( !unsafe ) {
+      Object.keys(properties).forEach(( key ) => {
+        if ( properties[ key ].public === false ) {
+          delete copy[ key ];
+        }
+      });
+    }
 
     // Return the modified instance. This is what will be serialized.
     return copy;

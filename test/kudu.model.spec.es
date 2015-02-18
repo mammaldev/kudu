@@ -140,7 +140,17 @@ describe('Kudu.Model', () => {
 
     describe('#toJSON', () => {
 
-      it('should strip private properties from the instance', () => {
+      it('should strip private properties from the instance by default', () => {
+        let obj = instance.toJSON();
+        expect(obj).not.to.have.property('hidden');
+      });
+
+      it('should not strip private properties in unsafe mode', () => {
+        let obj = instance.toJSON(true);
+        expect(obj).to.have.property('hidden');
+      });
+
+      it('should be called by JSON.stringify', () => {
         let serialised = JSON.stringify(instance);
         let obj = JSON.parse(serialised);
         expect(obj).not.to.have.property('hidden');
