@@ -17,6 +17,10 @@ beforeEach(() => {
       id: {
         type: 'integer',
         required: true
+      },
+      hidden: {
+        type: 'integer',
+        public: false
       }
     }
   });
@@ -114,14 +118,17 @@ describe('Kudu.Model', () => {
 
     beforeEach(() => {
       instance = new Model({
-        id: 1
+        id: 1,
+        hidden: 2
       });
     });
 
     describe('#toJSON', () => {
 
-      it('should be called when stringifying an instance', () => {
-        expect(JSON.stringify(instance)).to.be.a('string');
+      it('should strip private properties from the instance', () => {
+        let serialised = JSON.stringify(instance);
+        let obj = JSON.parse(serialised);
+        expect(obj).not.to.have.property('hidden');
       });
     });
   });
