@@ -1,0 +1,16 @@
+{
+  "name": "kudu-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "start": "npm run compile && node lib/server"
+  },
+  "dependencies": {
+    "kudu": "*",
+    "kudu-db-couch": "*",
+    "express": "^4.11.0",
+    "body-parser": "^1.10.0",
+    "bcrypt": "^0.8.1"
+  }
+}
