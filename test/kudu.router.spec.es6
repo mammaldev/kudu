@@ -217,6 +217,81 @@ describe('Kudu.Router', () => {
     });
   });
 
+  describe('generic descendant GET handler', () => {
+
+    beforeEach(( done ) => {
+
+      app.createModel('User', {
+        properties: {
+          id: {
+            type: 'integer',
+            required: true
+          }
+        }
+      });
+
+      app.createModel('List', {
+        properties: {
+          id: {
+            type: 'integer',
+            required: true
+          },
+          userId: {
+            type: 'integer',
+            required: true
+          }
+        }
+      });
+
+      app.db.configureRelationships({
+        users: {
+          lists: 'userId'
+        }
+      });
+
+      Promise.all([
+        app.db.create({ type: 'users', id: 1 }),
+        app.db.create({ type: 'users', id: 2 }),
+        app.db.create({ type: 'lists', id: 4, userId: 1 }),
+        app.db.create({ type: 'lists', id: 5, userId: 1 })
+      ])
+      .then(() => done());
+    });
+
+    it('should return all descendant instances when given valid data', ( done ) => {
+      request.get('/users/1/lists')
+      .expect(200)
+      .end(( err, res ) => {
+        expect(res.body).to.be.an('array').with.property('length', 2);
+        done();
+      });
+    });
+
+    it('should return an empty array when no descendant instances exist', ( done ) => {
+      request.get('/users/2/lists')
+      .expect(200)
+      .end(( err, res ) => {
+        expect(res.body).to.be.an('array').with.property('length', 0);
+        done();
+      });
+    });
+
+    it('should fail with 404 when the ancestor model is not found', ( done ) => {
+      request.get('/fail/1/lists')
+      .expect(404, done);
+    });
+
+    it('should fail with 404 when the descendant model is not found', ( done ) => {
+      request.get('/users/1/fail')
+      .expect(404, done);
+    });
+
+    it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
+      request.get('/users/throw/lists')
+      .expect(500, done);
+    });
+  });
+
   describe('#handle', () => {
 
     it('should set up a route handler on the Express app', ( done ) => {

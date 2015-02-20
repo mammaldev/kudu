@@ -40,6 +40,12 @@ export default class Router {
   //   PUT /users/:userId
   //   DELETE /users/:userId
   //
+  // There are also generic route handlers that allow you to take advantage
+  // of the relationships between models. If you have a List model and each
+  // list refers to a User model the following routes will be available:
+  //
+  //   GET /users/:userId/lists
+  //
   // This method should be called after any custom route handlers have been
   // configured because the URLs its uses are highly generic and would be
   // likely to match many more requests than intended.
@@ -56,6 +62,7 @@ export default class Router {
     let base = this.config.baseURL || '';
     let specificURL = base + '/:type/:id';
     let genericURL = base + '/:type';
+    let descendantURL = base + '/:ancestorType/:ancestorId/:descendantType';
     let express = this.kudu.app;
 
     express.post(genericURL, handlePost); // Create
@@ -63,6 +70,8 @@ export default class Router {
     express.get(genericURL, handleGet); // Get all
     express.put(specificURL, handlePut); // Update one
     express.delete(specificURL, handleDelete); // Delete one
+
+    express.get(descendantURL, handleDescendantGet);
 
     //
     // Utility functions
@@ -183,6 +192,31 @@ export default class Router {
       // Delete the instance in the database and send back an empty response.
       kudu.db.delete(instance)
       .then(() => res.status(204).end())
+      .catch(self.genericErrorHandler.bind(self, req, res));
+    }
+
+    function handleDescendantGet( req, res ) {
+
+      let descendantType = req.params.descendantType;
+      let ancestorType = req.params.ancestorType;
+
+      let Descendant = kudu.getModelByPluralName(descendantType);
+      let Ancestor = kudu.getModelByPluralName(ancestorType);
+
+      // If there aren't associated models we can't go any further.
+      if ( !Descendant || !Ancestor ) {
+        return res.status(404).end();
+      }
+
+      let ancestorId = req.params.ancestorId;
+
+      // Get the descendant instances and send them back to the client.
+      return kudu.db.getDescendants(ancestorType, ancestorId, descendantType)
+      .then(( data ) => {
+
+        let instances = data.map(( item ) => new Descendant(item));
+        res.status(200).json(instances);
+      })
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
   }
