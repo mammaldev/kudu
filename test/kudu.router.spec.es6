@@ -77,6 +77,25 @@ describe('Kudu.Router', () => {
     .expect(200, done);
   });
 
+  it('should ignore the base path when given the relevant option', ( done ) => {
+
+    let expressApp = express();
+    let app = new Kudu(expressApp, {
+      databaseAdapter: MockAdapter,
+      router: {
+        baseURL: '/api'
+      }
+    });
+    let request = supertest(expressApp);
+
+    app.router.handle('GET', '/handle', {
+      ignoreBaseURL: true
+    }, ( req, res ) => res.status(200).end());
+
+    request.get('/handle')
+    .expect(200, done);
+  });
+
   describe('#enableGenericRouteHandlers', () => {
 
     it('should throw an error if no database is configured', () => {

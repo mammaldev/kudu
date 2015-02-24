@@ -15,16 +15,28 @@ export default class Router {
   }
 
   // Register a route handler with Express. Takes an HTTP verb and a URL path.
-  handle( verb, path ) {
+  handle( verb, path, config ) {
+
+    let expressArgs;
+
+    // The config object is optional. If that parameter is a function then no
+    // config has been provided. Express exposes methods corresponding to HTTP
+    // verbs. The router exposes a single method and expects the verb as an
+    // argument. We slice off the verb, path and options, if present, and pass
+    // the rest of the arguments through.
+    if ( typeof config === 'function' ) {
+      expressArgs = [].slice.call(arguments, 2);
+      config = {};
+    } else {
+      expressArgs = [].slice.call(arguments, 3);
+    }
 
     // If the router has been configured with a base URL we prepend it to the
-    // path.
-    path = this.config.baseURL + path;
-
-    // Express exposes methods corresponding to HTTP verbs. The router exposes
-    // a single method and expects the verb as an argument. We slice off the
-    // verb and path pass the rest of the arguments through.
-    let expressArgs = [].slice.call(arguments, 2);
+    // path, except in the case when the config for this route explictly says
+    // not to.
+    if ( !config.hasOwnProperty('ignoreBaseURL') ) {
+      path = this.config.baseURL + path;
+    }
     expressArgs.unshift(path);
 
     this.kudu.app[ verb.toLowerCase() ].apply(this.kudu.app, expressArgs);
