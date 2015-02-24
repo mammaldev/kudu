@@ -226,7 +226,7 @@ export default class Router {
 
         let Model = kudu.getModelByPluralName(type);
 
-        if ( !Model ) {
+        if ( !Model || Model.schema.requestable === false ) {
           return null;
         }
 

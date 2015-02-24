@@ -37,6 +37,16 @@ beforeEach(() => {
     }
   });
 
+  app.createModel('Unrequestable', {
+    properties: {
+      id: {
+        type: 'integer',
+        required: true
+      }
+    },
+    requestable: false
+  });
+
   request = supertest(expressApp);
 });
 
@@ -98,6 +108,12 @@ describe('Kudu.Router', () => {
       .expect(404, done);
     });
 
+    it('should fail with 404 when the model is not requestable', ( done ) => {
+      request.post('/unrequestables')
+      .send({})
+      .expect(404, done);
+    });
+
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.post('/tests')
       .send({ id: 'invalid' })
@@ -132,6 +148,11 @@ describe('Kudu.Router', () => {
 
     it('should fail with 404 when a model is not found for the URL', ( done ) => {
       request.get('/fail')
+      .expect(404, done);
+    });
+
+    it('should fail with 404 when the model is not requestable', ( done ) => {
+      request.get('/unrequestables')
       .expect(404, done);
     });
 
@@ -173,6 +194,12 @@ describe('Kudu.Router', () => {
       .expect(404, done);
     });
 
+    it('should fail with 404 when the model is not requestable', ( done ) => {
+      request.post('/unrequestables')
+      .send({})
+      .expect(404, done);
+    });
+
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.put('/tests/1')
       .send({ id: 'invalid' })
@@ -201,6 +228,12 @@ describe('Kudu.Router', () => {
     it('should fail with 404 when a model is not found for the URL', ( done ) => {
       request.delete('/invalid/1')
       .send({ id: 2 })
+      .expect(404, done);
+    });
+
+    it('should fail with 404 when the model is not requestable', ( done ) => {
+      request.delete('/unrequestables/1')
+      .send({})
       .expect(404, done);
     });
 
