@@ -80,7 +80,7 @@ export default class Router {
     function handlePost( req, res ) {
 
       let type = req.params.type;
-      let Model = kudu.getModelByPluralName(type);
+      let [ Model ] = getModels(type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
@@ -107,7 +107,7 @@ export default class Router {
     function handleGet( req, res ) {
 
       let type = req.params.type;
-      let Model = kudu.getModelByPluralName(type);
+      let [ Model ] = getModels(type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
@@ -144,7 +144,7 @@ export default class Router {
     function handlePut( req, res ) {
 
       let type = req.params.type;
-      let Model = kudu.getModelByPluralName(type);
+      let [ Model ] = getModels(type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
@@ -171,7 +171,7 @@ export default class Router {
     function handleDelete( req, res ) {
 
       let type = req.params.type;
-      let Model = kudu.getModelByPluralName(type);
+      let [ Model ] = getModels(type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
@@ -200,8 +200,7 @@ export default class Router {
       let descendantType = req.params.descendantType;
       let ancestorType = req.params.ancestorType;
 
-      let Descendant = kudu.getModelByPluralName(descendantType);
-      let Ancestor = kudu.getModelByPluralName(ancestorType);
+      let [ Descendant, Ancestor ] = getModels(descendantType, ancestorType);
 
       // If there aren't associated models we can't go any further.
       if ( !Descendant || !Ancestor ) {
@@ -218,6 +217,21 @@ export default class Router {
         res.status(200).json(instances);
       })
       .catch(self.genericErrorHandler.bind(self, req, res));
+    }
+
+    // Get the models related to the URL
+    function getModels( ...types ) {
+
+      return types.map(( type ) => {
+
+        let Model = kudu.getModelByPluralName(type);
+
+        if ( !Model ) {
+          return null;
+        }
+
+        return Model;
+      });
     }
   }
 
