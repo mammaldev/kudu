@@ -2,7 +2,7 @@
   "name": "kudu",
   "version": "0.1.0",
   "scripts": {
-    "compile": "babel -d lib/ src/**/*.es6 src/*.es6 test/**/*.es6 test/*.es6",
+    "compile": "babel -d lib/ {src,test}{/**/,/}*.es6",
     "test": "npm run compile && mocha lib/test/ -R spec --recursive"
   },
   "main": "lib/src/kudu.js",
