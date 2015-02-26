@@ -17,7 +17,7 @@ export default class BaseModel {
     // If there were any errors that we can't continue. We just throw the first
     // one which allows a client to deal with them one at a time.
     if ( result.errors && result.errors.length ) {
-      throw new Error(result.errors[ 0 ].stack);
+      throw new Error(result.errors[ 0 ]);
     }
 
     // Add any default values to the instance where necessary. It is possible
