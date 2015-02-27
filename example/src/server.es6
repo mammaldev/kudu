@@ -13,7 +13,13 @@ expressApp.use(json());
 let app = new Kudu(expressApp, {
   databaseAdapter: CouchAdapter,
   database: {
-    url: process.env.DB_URL
+    url: process.env.DB_URL,
+    views: {
+      descendants: {
+        design: 'general',
+        view: 'descendant_type-ancestor_type-ancestor_id'
+      }
+    }
   }
 });
 
