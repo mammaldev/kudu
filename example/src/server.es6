@@ -1,3 +1,5 @@
+import 'core-js/shim';
+
 import Kudu from 'kudu';
 import CouchAdapter from 'kudu-db-couch';
 
