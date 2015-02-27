@@ -12,6 +12,7 @@ export default ( app ) => {
         type: 'string',
         required: true
       }
-    }
+    },
+    requestable: false
   })
 };
