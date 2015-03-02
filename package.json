@@ -17,6 +17,8 @@
     "mocha": "^2.0.1",
     "express": "^4.0.0",
     "supertest": "^0.15.0",
-    "body-parser": "^1.10.0"
+    "body-parser": "^1.10.0",
+    "eslint": "^0.15.1",
+    "babel-eslint": "^1.0.12"
   }
 }
