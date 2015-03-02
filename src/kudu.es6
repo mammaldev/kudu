@@ -2,7 +2,6 @@ import 'core-js/shim';
 
 import Router from './router';
 import Model from './models';
-import BaseModel from './models/base';
 
 export default class Kudu {
 
@@ -21,7 +20,8 @@ export default class Kudu {
 
     // Set up database adapter
     if ( typeof config.databaseAdapter === 'function' ) {
-      this.db = new config.databaseAdapter(this, config.database);
+      let Adapter = config.databaseAdapter;
+      this.db = new Adapter(this, config.database);
     }
 
     // Set up router
