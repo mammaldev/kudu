@@ -22,12 +22,6 @@ beforeEach(() => {
     databaseAdapter: MockAdapter
   });
 
-  app.router.handle('GET', '/handle', ( req, res ) => {
-    res.status(200).end();
-  });
-
-  app.router.enableGenericRouteHandlers();
-
   app.createModel('Test', {
     properties: {
       id: {
@@ -46,6 +40,12 @@ beforeEach(() => {
     },
     requestable: false
   });
+
+  app.router.handle('GET', '/handle', ( req, res ) => {
+    res.status(200).end();
+  });
+
+  app.router.enableGenericRouteHandlers();
 
   request = supertest(expressApp);
 });
