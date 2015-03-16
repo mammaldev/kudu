@@ -58,8 +58,14 @@ export default class Kudu {
       Constructor = new Kudu.Model(schema);
     }
 
-    this.modelsBySingularName[ singular.toLowerCase() ] = Constructor;
-    this.modelsByPluralName[ plural.toLowerCase() ] = Constructor;
+    // Expose the singular and plural names on the constructor.
+    singular = singular.toLowerCase();
+    plural = plural.toLowerCase();
+    [ Constructor.singular, Constructor.plural ] = [ singular, plural ];
+
+    // Add the constructor to the app-wide model caches.
+    this.modelsBySingularName[ singular ] = Constructor;
+    this.modelsByPluralName[ plural ] = Constructor;
 
     return Constructor;
   }

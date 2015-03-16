@@ -37,6 +37,16 @@ describe('Kudu', () => {
       expect(Model).to.be.a('function');
     });
 
+    it('should expose the lowercase singular name on the constructor', () => {
+      let Model = app.createModel('Test', {});
+      expect(Model.singular).to.equal('test');
+    });
+
+    it('should expose the lowercase plural name on the constructor', () => {
+      let Model = app.createModel('Test', {});
+      expect(Model.plural).to.equal('tests');
+    });
+
     it('should accept a parent model by singular name', () => {
       let Parent = app.createModel('parent', {});
       let Child = app.createModel('child', {}, 'parent');
