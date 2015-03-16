@@ -16,16 +16,27 @@ export default class Model {
       throw new Error('No schema provided.');
     }
 
+    let finalSchema = schema;
+
     // Models can inherit from other models. If a parent is specified we merge
-    // the parent schema with the one provided here.
+    // the parent schema with the one provided here. If a parent is not
+    // requestable the child will be, unless the requestable property is
+    // explictly set to false in the child schema.
     if ( ToExtend !== BaseModel ) {
-      schema = merge({}, schema, ToExtend.schema);
+      finalSchema = merge({}, schema, ToExtend.schema);
+
+      if (
+        finalSchema.requestable === false &&
+        !schema.hasOwnProperty('requestable')
+      ) {
+        delete finalSchema.requestable;
+      }
     }
 
     class Constructor extends ToExtend {
 
       static get schema() {
-        return schema;
+        return finalSchema;
       }
 
       constructor( data ) {

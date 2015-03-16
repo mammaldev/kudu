@@ -6,6 +6,8 @@ let expect = chai.expect;
 let Model;
 let EmptyModel;
 let InheritedModel;
+let UnrequestableModel;
+let InheritedUnrequestableModel;
 
 beforeEach(() => {
 
@@ -39,6 +41,15 @@ beforeEach(() => {
     }
   });
   InheritedModel.prototype.anotherMethod = () => 2;
+
+  UnrequestableModel = new Kudu.Model({
+    properties: {},
+    requestable: false
+  });
+
+  InheritedUnrequestableModel = new Kudu.Model(UnrequestableModel, {
+    properties: {}
+  });
 });
 
 describe('Kudu.Model', () => {
@@ -95,6 +106,10 @@ describe('Kudu.Model', () => {
         defaults: 'present'
       })).to.have.property('defaults', 'present');
     });
+
+    it('should have a requestable property when set to false', () => {
+      expect(UnrequestableModel.schema).to.have.property('requestable', false);
+    });
   });
 
   describe('Extended instances', () => {
@@ -124,6 +139,11 @@ describe('Kudu.Model', () => {
     it('should have access to methods from the parent', () => {
       let instance = new InheritedModel({ id: 1, additional: '1' });
       expect(instance).to.have.deep.property('someMethod');
+    });
+
+    it('should be requestable if not explictly set as not', () => {
+      expect(InheritedUnrequestableModel.schema)
+      .not.to.have.deep.property('requestable');
     });
   });
 

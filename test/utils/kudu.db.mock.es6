@@ -35,7 +35,7 @@ export default class MockAdapter {
   }
 
   getAll( type ) {
-    return new Promise(( resolve ) => resolve(this.cache[ type ]));
+    return new Promise(( resolve ) => resolve(this.cache[ type ] || []));
   }
 
   getDescendants( ancestorType, ancestorId, descendantType ) {

@@ -31,7 +31,7 @@ beforeEach(() => {
     }
   });
 
-  app.createModel('Unrequestable', {
+  let Unreq = app.createModel('Unrequestable', {
     properties: {
       id: {
         type: 'integer',
@@ -40,6 +40,10 @@ beforeEach(() => {
     },
     requestable: false
   });
+
+  app.createModel('Requestable', {
+    properties: {}
+  }, Unreq);
 
   app.router.handle('GET', '/handle', ( req, res ) => {
     res.status(200).end();
@@ -131,6 +135,12 @@ describe('Kudu.Router', () => {
       request.post('/unrequestables')
       .send({})
       .expect(404, done);
+    });
+
+    it('should allow requests to non-explicitly unrequestable children', ( done ) => {
+      request.post('/requestables')
+      .send({})
+      .expect(201, done);
     });
 
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
