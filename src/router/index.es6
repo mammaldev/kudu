@@ -45,7 +45,7 @@ export default class Router {
   // Register a route handler specific to a Kudu model with Express. Takes a
   // Kudu model constructor (or model name as a string) and delegates the rest
   // of its arguments to Router#handle.
-  handleForModel( model, verb, path, ...rest ) {
+  handleForModel( model, verb, path ) {
 
     // If the provided model is a string we need to get the actual constructor.
     // This is (a) to ensure the model exists and (b) so we can get its plural
@@ -69,8 +69,20 @@ export default class Router {
       throw new Error(`Model ${ model } is not registered.`);
     }
 
-    // Get the plural name of the model and let Router#handle do the rest.
+    // Build the path. It will always be prefixed with the plural model name.
+    // If no path is provided to this method then the route handler will be
+    // shadowing the relevant generic handler.
+    let rest;
+    if ( typeof path === 'function' ) {
+      rest = [].slice.call(arguments, 2);
+      path = '';
+    } else {
+      rest = [].slice.call(arguments, 3);
+    }
+
     let modelPath = `/${ Model.plural }${ path }`;
+
+    // Hand off to Router#handle which will register the route with Express.
     this.handle(verb, modelPath, ...rest);
   }
 

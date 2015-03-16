@@ -405,5 +405,13 @@ describe('Kudu.Router', () => {
       let test = () => app.router.handleForModel('x');
       expect(test).to.throw(/not registered/);
     });
+
+    it('should allow omission of a URL path', ( done ) => {
+      app.router.handleForModel('test', 'GET', ( req, res ) => {
+        res.status(200).end();
+      });
+      request.get('/tests')
+      .expect(200, done);
+    });
   });
 });
