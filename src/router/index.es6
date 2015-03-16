@@ -50,7 +50,8 @@ export default class Router {
     // If the provided model is a string we need to get the actual constructor.
     // This is (a) to ensure the model exists and (b) so we can get its plural
     // name as URLs should always use the plural.
-    let Model;
+    let Model = model;
+
     if ( typeof model === 'string' ) {
 
       // Assume that the given string corresponds to a singular model name.

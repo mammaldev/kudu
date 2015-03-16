@@ -356,6 +356,7 @@ describe('Kudu.Router', () => {
 
     let expressApp;
     let request;
+    let Test;
     let app;
 
     beforeEach(() => {
@@ -364,7 +365,7 @@ describe('Kudu.Router', () => {
       expressApp.use(json());
       app = new Kudu(expressApp, {});
 
-      app.createModel('Test', {
+      Test = app.createModel('Test', {
         properties: {
           id: {
             type: 'integer',
@@ -386,6 +387,14 @@ describe('Kudu.Router', () => {
 
     it('should resolve plural model names', ( done ) => {
       app.router.handleForModel('tests', 'GET', '/handle', ( req, res ) => {
+        res.status(200).end();
+      });
+      request.get('/tests/handle')
+      .expect(200, done);
+    });
+
+    it('should resolve model constructors', ( done ) => {
+      app.router.handleForModel(Test, 'GET', '/handle', ( req, res ) => {
         res.status(200).end();
       });
       request.get('/tests/handle')
