@@ -42,6 +42,37 @@ export default class Router {
     this.kudu.app[ verb.toLowerCase() ].apply(this.kudu.app, expressArgs);
   }
 
+  // Register a route handler specific to a Kudu model with Express. Takes a
+  // Kudu model constructor (or model name as a string) and delegates the rest
+  // of its arguments to Router#handle.
+  handleForModel( model, verb, path, ...rest ) {
+
+    // If the provided model is a string we need to get the actual constructor.
+    // This is (a) to ensure the model exists and (b) so we can get its plural
+    // name as URLs should always use the plural.
+    let Model;
+    if ( typeof model === 'string' ) {
+
+      // Assume that the given string corresponds to a singular model name.
+      Model = this.kudu.getModel(model);
+
+      // If that didn't work then we can try again with the plural name.
+      if ( !Model ) {
+        Model = this.kudu.getModelByPluralName(model);
+      }
+    }
+
+    // If we don't have a model constructor at this point then the given name
+    // didn't correspond to a registered model and we can't proceed.
+    if ( !Model ) {
+      throw new Error(`Model ${ model } is not registered.`);
+    }
+
+    // Get the plural name of the model and let Router#handle do the rest.
+    let modelPath = `/${ Model.plural }${ path }`;
+    this.handle(verb, modelPath, ...rest);
+  }
+
   // Configure generic API routes. URLs are based on pluralised model names.
   // For example an application with a 'User' model will currently accept the
   // following requests by default:

@@ -351,4 +351,50 @@ describe('Kudu.Router', () => {
       .expect(200, done);
     });
   });
+
+  describe('#handleForModel', () => {
+
+    let expressApp;
+    let request;
+    let app;
+
+    beforeEach(() => {
+
+      expressApp = express();
+      expressApp.use(json());
+      app = new Kudu(expressApp, {});
+
+      app.createModel('Test', {
+        properties: {
+          id: {
+            type: 'integer',
+            required: true
+          }
+        }
+      });
+
+      request = supertest(expressApp);
+    });
+
+    it('should resolve singular model names', ( done ) => {
+      app.router.handleForModel('test', 'GET', '/handle', ( req, res ) => {
+        res.status(200).end();
+      });
+      request.get('/tests/handle')
+      .expect(200, done);
+    });
+
+    it('should resolve plural model names', ( done ) => {
+      app.router.handleForModel('tests', 'GET', '/handle', ( req, res ) => {
+        res.status(200).end();
+      });
+      request.get('/tests/handle')
+      .expect(200, done);
+    });
+
+    it('should throw an error for unregistered model names', () => {
+      let test = () => app.router.handleForModel('x');
+      expect(test).to.throw(/not registered/);
+    });
+  });
 });
