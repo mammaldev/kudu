@@ -2,10 +2,10 @@
   "name": "kudu",
   "version": "0.1.0",
   "scripts": {
-    "compile": "babel -d lib/ {src,test}{/**/,/}*.es6",
-    "test": "npm run compile && mocha lib/test/ -R spec --recursive"
+    "compile": "babel -d lib/ src/",
+    "test": "mocha test/ -R spec --recursive --compilers es6:babel/register"
   },
-  "main": "lib/src/kudu.js",
+  "main": "lib/kudu.js",
   "dependencies": {
     "jsonschema": "^1.0.0",
     "core-js": "^0.5.2",
