@@ -6,6 +6,7 @@ import express from 'express';
 import chai from 'chai';
 
 import MockAdapter from './utils/kudu.db.mock';
+import Router from '../src/router';
 import Kudu from '../src/kudu';
 
 let expect = chai.expect;
@@ -56,12 +57,8 @@ beforeEach(() => {
 
 describe('Kudu.Router', () => {
 
-  it('should be a constructor function exposed on Kudu', () => {
-    expect(Kudu.Router).to.be.a('function');
-  });
-
   it('should be instantiated and exposed on Kudu instances', () => {
-    expect(app.router).to.be.an.instanceOf(Kudu.Router);
+    expect(app.router).to.be.an.instanceOf(Router);
   });
 
   it('should prepend a given base path to each URL', ( done ) => {

@@ -5,10 +5,6 @@ import Modeller from './modeller';
 
 export default class Kudu {
 
-  static get Router() {
-    return Router;
-  }
-
   constructor( app, config = {} ) {
 
     // Keep a reference to the server (usually an Express app)
@@ -24,6 +20,6 @@ export default class Kudu {
     this.model = new Modeller();
 
     // Set up router
-    this.router = new Kudu.Router(this, config.router);
+    this.router = new Router(this, config.router);
   }
 }
