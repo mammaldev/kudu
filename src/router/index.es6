@@ -55,11 +55,11 @@ export default class Router {
     if ( typeof model === 'string' ) {
 
       // Assume that the given string corresponds to a singular model name.
-      Model = this.kudu.getModel(model);
+      Model = this.kudu.model.get(model);
 
       // If that didn't work then we can try again with the plural name.
       if ( !Model ) {
-        Model = this.kudu.getModelByPluralName(model);
+        Model = this.kudu.model.getByPluralName(model);
       }
     }
 
@@ -280,7 +280,7 @@ export default class Router {
 
       return types.map(( type ) => {
 
-        let Model = kudu.getModelByPluralName(type);
+        let Model = kudu.model.getByPluralName(type);
 
         if ( !Model || Model.schema.requestable === false ) {
           return null;

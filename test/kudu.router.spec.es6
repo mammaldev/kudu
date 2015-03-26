@@ -22,7 +22,7 @@ beforeEach(() => {
     databaseAdapter: MockAdapter
   });
 
-  app.createModel('Test', {
+  app.model.create('Test', {
     properties: {
       id: {
         type: 'integer',
@@ -31,7 +31,7 @@ beforeEach(() => {
     }
   });
 
-  let Unreq = app.createModel('Unrequestable', {
+  let Unreq = app.model.create('Unrequestable', {
     properties: {
       id: {
         type: 'integer',
@@ -41,7 +41,7 @@ beforeEach(() => {
     requestable: false
   });
 
-  app.createModel('Requestable', {
+  app.model.create('Requestable', {
     properties: {}
   }, Unreq);
 
@@ -283,7 +283,7 @@ describe('Kudu.Router', () => {
 
     beforeEach(( done ) => {
 
-      app.createModel('User', {
+      app.model.create('User', {
         properties: {
           id: {
             type: 'integer',
@@ -292,7 +292,7 @@ describe('Kudu.Router', () => {
         }
       });
 
-      app.createModel('List', {
+      app.model.create('List', {
         properties: {
           id: {
             type: 'integer',
@@ -375,7 +375,7 @@ describe('Kudu.Router', () => {
       expressApp.use(json());
       app = new Kudu(expressApp, {});
 
-      Test = app.createModel('Test', {
+      Test = app.model.create('Test', {
         properties: {
           id: {
             type: 'integer',

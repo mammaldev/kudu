@@ -1,9 +1,9 @@
 import chai from 'chai';
-import Kudu from '../src/kudu';
-import BaseModel from '../src/models/base';
+import Model from '../src/modeller/model';
+import BaseModel from '../src/modeller/base';
 
 let expect = chai.expect;
-let Model;
+let BasicModel;
 let EmptyModel;
 let InheritedModel;
 let UnrequestableModel;
@@ -11,9 +11,9 @@ let InheritedUnrequestableModel;
 
 beforeEach(() => {
 
-  EmptyModel = new Kudu.Model({});
+  EmptyModel = new Model({});
 
-  Model = new Kudu.Model({
+  BasicModel = new Model({
     title: 'Test',
     properties: {
       id: {
@@ -30,9 +30,9 @@ beforeEach(() => {
       }
     }
   });
-  Model.prototype.someMethod = () => 1;
+  BasicModel.prototype.someMethod = () => 1;
 
-  InheritedModel = new Kudu.Model(Model, {
+  InheritedModel = new Model(BasicModel, {
     properties: {
       additional: {
         type: 'string',
@@ -42,38 +42,34 @@ beforeEach(() => {
   });
   InheritedModel.prototype.anotherMethod = () => 2;
 
-  UnrequestableModel = new Kudu.Model({
+  UnrequestableModel = new Model({
     properties: {},
     requestable: false
   });
 
-  InheritedUnrequestableModel = new Kudu.Model(UnrequestableModel, {
+  InheritedUnrequestableModel = new Model(UnrequestableModel, {
     properties: {}
   });
 });
 
 describe('Kudu.Model', () => {
 
-  it('should be a static method on Kudu', () => {
-    expect(Kudu.Model).to.exist();
-  });
-
   it('should throw an error if not passed a schema object', () => {
     function test() {
-      return new Kudu.Model();
+      return new Model();
     }
     expect(test).to.throw(Error, /schema/);
   });
 
   it('should return a constructor function', () => {
-    expect(Model).to.be.a('function');
+    expect(BasicModel).to.be.a('function');
   });
 
   describe('Constructor functions', () => {
 
     it('should throw an error if not passed instance data', () => {
       function test() {
-        return new Model();
+        return new BasicModel();
       }
       expect(test).to.throw(Error, /instance data/);
     });
@@ -91,17 +87,17 @@ describe('Kudu.Model', () => {
 
     it('should validate instance data against the schema', () => {
       function test() {
-        return new Model({});
+        return new BasicModel({});
       }
       expect(test).to.throw(Error, /is required/);
     });
 
     it('should receive default values for missing properties', () => {
-      expect(new Model({ id: 1 })).to.have.property('defaults', 'default');
+      expect(new BasicModel({ id: 1 })).to.have.property('defaults', 'default');
     });
 
     it('should not use default values when property is present', () => {
-      expect(new Model({
+      expect(new BasicModel({
         id: 1,
         defaults: 'present'
       })).to.have.property('defaults', 'present');
@@ -152,7 +148,7 @@ describe('Kudu.Model', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new Model({
+      instance = new BasicModel({
         id: 1,
         hidden: 2
       });
