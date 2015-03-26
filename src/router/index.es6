@@ -1,4 +1,5 @@
 let defaults = Symbol();
+let getModels = Symbol();
 
 export default class Router {
 
@@ -12,6 +13,12 @@ export default class Router {
 
     this.kudu = kudu;
     this.config = Object.assign({}, this[ defaults ], config);
+
+    // Build URLs
+    let base = this.config.baseURL;
+    this.specificURL = `${ base }/:type/:id`;
+    this.genericURL = `${ base }/:type`;
+    this.descendantURL = `${ base }/:ancestorType/:ancestorId/:descendantType`;
   }
 
   // Register a route handler with Express. Takes an HTTP verb and a URL path.
@@ -86,6 +93,60 @@ export default class Router {
     this.handle(verb, modelPath, ...rest);
   }
 
+  // Configure generic API validation routes. URLs are based on pluralised
+  // model names. For example an application with a 'User' model will currently
+  // accept the following requests by default:
+  //
+  //   POST /users
+  //   PUT /users/:userId
+  //   DELETE /users/:userId
+  //
+  // This method should be called before any custom route handlers have been
+  // configured. If the route appears to match a registered model the provided
+  // data is validated. If it's valid we attach the instance to the request and
+  // move to the next route handler which could either be a custom app-specific
+  // function or the final generic handler.
+  enableGenericValidationRoutes() {
+
+    let { kudu, specificURL, genericURL } = this;
+    let express = kudu.app;
+    let self = this;
+
+    express.post(genericURL, validate); // Create one
+    express.put(specificURL, validate); // Update one
+    express.delete(specificURL, validate); // Delete one
+
+    //
+    // Utility functions
+    //
+
+    function validate( req, res, next ) {
+
+      let type = req.params.type;
+      let [ Model ] = self[ getModels ](type);
+
+      // If there isn't an associated model we can't go any further so we hand
+      // off to the next route handler.
+      if ( !Model ) {
+        return next();
+      }
+
+      // If there is a model we can attempt to instantiate it with the data
+      // provided with the request. If the data is invalid we send back an
+      // error.
+      try {
+        req.instance = new Model(req.body);
+      } catch ( e ) {
+        return res.status(400).send(e.toString());
+      }
+
+      // Hand off to the next route handler. The next handler could either be a
+      // custom function that performs further validation or it could be the
+      // second half of the generic route handler that performs data access.
+      next();
+    }
+  }
+
   // Configure generic API routes. URLs are based on pluralised model names.
   // For example an application with a 'User' model will currently accept the
   // following requests by default:
@@ -107,19 +168,16 @@ export default class Router {
   // likely to match many more requests than intended.
   enableGenericRouteHandlers() {
 
-    let self = this;
-    let kudu = this.kudu;
+    let { kudu } = this;
 
     if ( !kudu.hasOwnProperty('db') ) {
       throw new Error('Generic route handlers cannot be enabled for an ' +
        'application that does not have a database adapter configured.');
     }
 
-    let base = this.config.baseURL || '';
-    let specificURL = base + '/:type/:id';
-    let genericURL = base + '/:type';
-    let descendantURL = base + '/:ancestorType/:ancestorId/:descendantType';
-    let express = this.kudu.app;
+    let { specificURL, genericURL, descendantURL } = this;
+    let express = kudu.app;
+    let self = this;
 
     express.post(genericURL, handlePost); // Create
     express.get(specificURL, handleGet); // Get one
@@ -135,23 +193,17 @@ export default class Router {
 
     function handlePost( req, res ) {
 
-      let type = req.params.type;
-      let [ Model ] = getModels(type);
+      // A model instance should be attached to the request object. The generic
+      // validation route attaches it before handing off to the next route
+      // handler. We trust that no subsequent handlers have modified it in a
+      // way that makes it an invalid instance so we don't have to do the same
+      // validation again here.
+      let instance = req.instance;
 
-      // If there isn't an associated model we can't go any further.
-      if ( !Model ) {
-        return res.status(404).end();
-      }
-
-      // If there is a model we can attempt to instantiate it with the data
-      // provided with the request. If the data is invalid we send back an
-      // error.
-      let instance;
-
-      try {
-        instance = new Model(req.body);
-      } catch ( e ) {
-        return res.status(400).send(e.toString());
+      // If no instance is present it's likely that the request is not related
+      // to a model so we send a 404.
+      if ( !instance ) {
+        res.status(404).end();
       }
 
       // Save the instance in the database and send it back to the client.
@@ -163,7 +215,7 @@ export default class Router {
     function handleGet( req, res ) {
 
       let type = req.params.type;
-      let [ Model ] = getModels(type);
+      let [ Model ] = self[ getModels ](type);
 
       // If there isn't an associated model we can't go any further.
       if ( !Model ) {
@@ -199,23 +251,10 @@ export default class Router {
 
     function handlePut( req, res ) {
 
-      let type = req.params.type;
-      let [ Model ] = getModels(type);
+      let instance = req.instance;
 
-      // If there isn't an associated model we can't go any further.
-      if ( !Model ) {
-        return res.status(404).end();
-      }
-
-      // If there is a model we can attempt to instantiate it with the data
-      // provided with the request. If the data is invalid we send back an
-      // error.
-      let instance;
-
-      try {
-        instance = new Model(req.body);
-      } catch ( e ) {
-        return res.status(400).send(e.toString());
+      if ( !instance ) {
+        res.status(404).end();
       }
 
       // Save the instance in the database and send it back to the client.
@@ -226,23 +265,10 @@ export default class Router {
 
     function handleDelete( req, res ) {
 
-      let type = req.params.type;
-      let [ Model ] = getModels(type);
+      let instance = req.instance;
 
-      // If there isn't an associated model we can't go any further.
-      if ( !Model ) {
-        return res.status(404).end();
-      }
-
-      // If there is a model we can attempt to instantiate it with the data
-      // provided with the request. If the data is invalid we send back an
-      // error.
-      let instance;
-
-      try {
-        instance = new Model(req.body);
-      } catch ( e ) {
-        return res.status(400).send(e.toString());
+      if ( !instance ) {
+        res.status(404).end();
       }
 
       // Delete the instance in the database and send back an empty response.
@@ -256,7 +282,7 @@ export default class Router {
       let descendantType = req.params.descendantType;
       let ancestorType = req.params.ancestorType;
 
-      let [ Descendant, Ancestor ] = getModels(descendantType, ancestorType);
+      let [ Descendant, Ancestor ] = self[ getModels ](descendantType, ancestorType);
 
       // If there aren't associated models we can't go any further.
       if ( !Descendant || !Ancestor ) {
@@ -274,21 +300,20 @@ export default class Router {
       })
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
+  }
 
-    // Get the models related to the URL
-    function getModels( ...types ) {
+  // Get model constructors by plural name.
+  [ getModels ]( ...types ) {
 
-      return types.map(( type ) => {
+    return types.map(( type ) => {
+      let Model = this.kudu.model.getByPluralName(type);
 
-        let Model = kudu.model.getByPluralName(type);
+      if ( !Model || Model.schema.requestable === false ) {
+        return null;
+      }
 
-        if ( !Model || Model.schema.requestable === false ) {
-          return null;
-        }
-
-        return Model;
-      });
-    }
+      return Model;
+    });
   }
 
   genericErrorHandler( req, res ) {

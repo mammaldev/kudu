@@ -21,5 +21,6 @@ export default class Kudu {
 
     // Set up router
     this.router = new Router(this, config.router);
+    this.router.enableGenericValidationRoutes();
   }
 }

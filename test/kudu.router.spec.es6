@@ -50,6 +50,10 @@ beforeEach(() => {
     res.status(200).end();
   });
 
+  app.router.handle('POST', '/handle', ( req, res ) => {
+    res.status(201).end();
+  });
+
   app.router.enableGenericRouteHandlers();
 
   request = supertest(expressApp);
@@ -353,9 +357,14 @@ describe('Kudu.Router', () => {
 
   describe('#handle', () => {
 
-    it('should set up a route handler on the Express app', ( done ) => {
+    it('should set up a GET route handler on the Express app', ( done ) => {
       request.get('/handle')
       .expect(200, done);
+    });
+
+    it('should set up a POST route handler on the Express app', ( done ) => {
+      request.post('/handle')
+      .expect(201, done);
     });
   });
 
