@@ -131,6 +131,31 @@ export default class Router {
         return next();
       }
 
+      // If there is a model we need to check if it has any registered hook
+      // functions. The hooks would commonly be used to add sensitive data to
+      // an instance. For example, assume an 'account' model which refers to a
+      // 'user' model. The 'account' instance should set its own 'userId' from
+      // the session to prevent clients being able to spoof it.
+      let hooks = Model.hasOwnProperty('hooks') && Model.hooks;
+
+      if ( hooks ) {
+
+        // Hooks can be specific to HTTP methods. If one is defined for the
+        // method of the current request we run it now, passing in the request
+        // body. The hook is expected to modify the object in-place.
+        let method = req.method && req.method.toLowerCase();
+
+        if ( typeof hooks[ method ] === 'function' ) {
+          hooks[ method ](req.body);
+        }
+
+        // An 'all' hook applies to all HTTP methods. Method-specific hooks
+        // take precedence over this but it will run after anyway.
+        if ( typeof Model.hooks.all === 'function' ) {
+          hooks.all(req.body);
+        }
+      }
+
       // If there is a model we can attempt to instantiate it with the data
       // provided with the request. If the data is invalid we send back an
       // error.

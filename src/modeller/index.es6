@@ -46,6 +46,9 @@ export default class Router {
     plural = plural.toLowerCase();
     [ Constructor.singular, Constructor.plural ] = [ singular, plural ];
 
+    // Expose any hook functions on the constructor.
+    Constructor.hooks = schema.hooks;
+
     // Add the constructor to the app-wide model caches.
     this.modelsBySingularName[ singular ] = Constructor;
     this.modelsByPluralName[ plural ] = Constructor;

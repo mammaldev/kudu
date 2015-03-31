@@ -32,6 +32,23 @@ beforeEach(() => {
     }
   });
 
+  app.model.create('HookTest', {
+    properties: {
+      id: {
+        type: 'integer',
+        required: true
+      }
+    },
+    hooks: {
+      post ( obj ) {
+        obj.hooked = true;
+      },
+      put( obj ) {
+        obj.hooked = true;
+      }
+    }
+  });
+
   let Unreq = app.model.create('Unrequestable', {
     properties: {
       id: {
@@ -155,6 +172,16 @@ describe('Kudu.Router', () => {
       .send({ id: 0 })
       .expect(500, done);
     });
+
+    it('should allow a POST hook to modify the request body', ( done ) => {
+      request.post('/hooktests')
+      .send({ id: 1 })
+      .expect(201)
+      .end(( err, res ) => {
+        expect(res.body).to.have.property('hooked', true);
+        done();
+      });
+    });
   });
 
   describe('generic GET handler', () => {
@@ -240,6 +267,16 @@ describe('Kudu.Router', () => {
       request.put('/tests/1')
       .send({ id: 0 })
       .expect(500, done);
+    });
+
+    it('should allow a PUT hook to modify the request body', ( done ) => {
+      request.put('/hooktests/1')
+      .send({ id: 2 })
+      .expect(201)
+      .end(( err, res ) => {
+        expect(res.body).to.have.property('hooked', true);
+        done();
+      });
     });
   });
 

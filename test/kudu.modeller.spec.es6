@@ -36,6 +36,12 @@ describe('Kudu.Modeller', () => {
       expect(Model.plural).to.equal('tests');
     });
 
+    it('should expose a "hook" property on the constructor', () => {
+      let hooks = {};
+      let Model = model.create('Test', { hooks });
+      expect(Model.hooks).to.equal(hooks);
+    });
+
     it('should accept a parent model by singular name', () => {
       let Parent = model.create('parent', {});
       let Child = model.create('child', {}, 'parent');
