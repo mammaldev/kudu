@@ -2,7 +2,7 @@ import Model from './model';
 
 let defaults = Symbol();
 
-export default class Router {
+export default class Modeller {
 
   get [ defaults ]() {
     return {};
