@@ -1,7 +1,9 @@
 {
   "parser": "babel-eslint",
   "rules": {
+    "no-comma-dangle": "always",
     "quotes": [ 2, "single" ],
+    "no-inner-declarations": 0,
     "no-shadow": 0,
     "no-use-before-define": [ 2, "nofunc" ],
     "strict": 0

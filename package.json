@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "compile": "babel -d lib/ src/",
+    "lint": "eslint {src,test}/{**/*.es6,*.es6}; true",
     "test": "mocha test/ -R spec --recursive --compilers es6:babel/register"
   },
   "main": "lib/kudu.js",
@@ -12,8 +13,8 @@
     "lodash": "^3.2.0"
   },
   "devDependencies": {
-    "babel": "^4.0.1",
-    "babel-eslint": "^1.0.12",
+    "babel": "^5.1.10",
+    "babel-eslint": "^3.0.1",
     "body-parser": "^1.10.0",
     "chai": "^1.10.0",
     "eslint": "^0.15.1",
