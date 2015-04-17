@@ -222,6 +222,11 @@ describe('Kudu.Router', () => {
       });
     });
 
+    it('should include an ETag header in response for a single instance', ( done ) => {
+      request.get('/tests/1')
+      .expect('ETag', /^W\/"/, done);
+    });
+
     it('should fail with 404 when no instance is found for the given ID', ( done ) => {
       request.get('/tests/3')
       .expect(404, done);

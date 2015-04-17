@@ -172,5 +172,16 @@ describe('Kudu.Model', () => {
         expect(obj).not.to.have.property('hidden');
       });
     });
+
+    describe('#etag', () => {
+
+      it('should return a hash of the serialized instance', () => {
+        expect(instance.etag()).to.be.a('string');
+      });
+
+      it('should prefix the hash as a weak entity tag', () => {
+        expect(instance.etag()).to.contain('W/"');
+      });
+    });
   });
 });

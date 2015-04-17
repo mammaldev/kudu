@@ -259,6 +259,17 @@ export default class Router {
           }
 
           let instance = new Model(data);
+
+          // Generate an entity tag for the instance and set the relevant
+          // response header. This allows for optimistic concurrency control
+          // if the client includes the ETag in any subsequent modifying
+          // requests.
+          let etag = instance.etag();
+
+          if ( etag ) {
+            res.header('ETag', etag);
+          }
+
           return res.status(200).json(instance);
         })
         .catch(self.genericErrorHandler.bind(self, req, res));

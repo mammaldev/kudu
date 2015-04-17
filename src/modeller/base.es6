@@ -1,4 +1,5 @@
 import { validate } from 'jsonschema';
+import { createHash } from 'crypto';
 
 export default class BaseModel {
 
@@ -57,5 +58,20 @@ export default class BaseModel {
 
     // Return the modified instance. This is what will be serialized.
     return copy;
+  }
+
+  // Generate a weak entity tag for the instance in its current state. The tags
+  // are weak because the order of object properties is not guaranteed which
+  // makes a byte-to-byte comparison prone to failure.
+  etag() {
+
+    // Serialize the instance. This strips off any private properties which is
+    // fine because clients should not be able to modify such properties.
+    let serialized = JSON.stringify(this);
+
+    // Return a SHA1 hash of the serialized object. This will be sent to the
+    // client in an ETag header and used to compare versions when the client
+    // sends an updated version of this resource.
+    return `W/"${ createHash('sha1').update(serialized).digest('hex') }"`;
   }
 }
