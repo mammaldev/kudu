@@ -235,6 +235,14 @@ describe('Kudu.Router', () => {
 
   describe('generic PUT handler', () => {
 
+    beforeEach(( done ) => {
+      Promise.all([
+        app.db.create({ type: 'tests', id: 1 }),
+        app.db.create({ type: 'hooktests', id: 1 }),
+      ])
+      .then(() => done());
+    });
+
     it('should return a serialized model instance when given valid data', ( done ) => {
       request.put('/tests/1')
       .send({ id: 2 })
@@ -247,6 +255,12 @@ describe('Kudu.Router', () => {
 
     it('should fail with 404 when a model is not found for the URL', ( done ) => {
       request.put('/invalid/1')
+      .send({ id: 2 })
+      .expect(404, done);
+    });
+
+    it('should fail with 404 when an instance is not found for the URL', ( done ) => {
+      request.put('/tests/2')
       .send({ id: 2 })
       .expect(404, done);
     });

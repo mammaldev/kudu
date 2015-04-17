@@ -282,8 +282,22 @@ export default class Router {
         res.status(404).end();
       }
 
-      // Save the instance in the database and send it back to the client.
-      kudu.db.update(instance)
+      // Retrieve the corresponding instance from the database. Since PUT is
+      // intended to update an existing resource we need to ensure the resource
+      // does actually exist.
+      kudu.db.get(req.params.type, req.params.id)
+      .then(( saved ) => {
+
+        // If the resource in question is not already stored then we can't
+        // update it. We can't just create it because we want to maintain
+        // indempotence.
+        if ( !saved ) {
+          return res.status(404).end();
+        }
+
+        // Save the instance in the database and send it back to the client.
+        return kudu.db.update(instance);
+      })
       .then(() => res.status(200).json(instance))
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
