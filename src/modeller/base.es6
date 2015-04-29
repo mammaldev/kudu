@@ -10,6 +10,18 @@ export default class BaseModel {
       throw new Error('No instance data provided.');
     }
 
+    // Add any default values to the instance where necessary. It is possible
+    // but unlikely for a model schema to have no properties. It would be nice
+    // if the JSON-Schema module did this for us but it doesn't so for now we
+    // have to do it manually.
+    if ( data ) {
+      Object.keys(data).forEach(( k ) => {
+        if ( properties[ k ].default && !data.hasOwnProperty(k) ) {
+          data[ k ] = properties[ k ].default;
+        }
+      });
+    }
+
     // Validate the provided data against the schema.
     let schema = this.constructor.schema;
     let result = validate(data, schema);
@@ -18,20 +30,6 @@ export default class BaseModel {
     // one which allows a client to deal with them one at a time.
     if ( result.errors && result.errors.length ) {
       throw new Error(result.errors[ 0 ]);
-    }
-
-    // Add any default values to the instance where necessary. It is possible
-    // but unlikely for a model schema to have no properties. It would be nice
-    // if the JSON-Schema module did this for us but it doesn't so for now we
-    // have to do it manually.
-    let properties = schema.properties;
-
-    if ( properties ) {
-      Object.keys(properties).forEach(( k ) => {
-        if ( properties[ k ].default && !result.instance.hasOwnProperty(k) ) {
-          result.instance[ k ] = properties[ k ].default;
-        }
-      });
     }
 
     // Add a property to the instance for each key of the given data
