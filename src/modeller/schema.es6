@@ -16,5 +16,19 @@ export default {
     if ( typeof schema.properties !== 'object' ) {
       throw new Error('A model schema must include a "properties" object.');
     }
-  }
-}
+
+    // Enumerate the keys of the 'properties' object. Each value dictates how
+    // its key should be validated on the 'data' object.
+    let properties = schema.properties;
+    Object.keys(properties).forEach(( key ) => {
+
+      let sub = properties[ key ];
+
+      // If a property is 'required' it must be present on the data object. The
+      // value of 'required' must be a boolean value.
+      if ( sub.required === true && !data.hasOwnProperty(key) ) {
+        throw new Error(`Property "${ key }" is required.`);
+      }
+    });
+  },
+};

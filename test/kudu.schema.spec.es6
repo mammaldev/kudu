@@ -26,5 +26,16 @@ describe('Kudu.Schema', () => {
       let test = () => validate({}, {});
       expect(test).to.throw(Error, /properties/);
     });
+
+    it('should throw errors for missing "required" properties', () => {
+      let test = () => validate({}, {
+        properties: {
+          name: {
+            required: true,
+          },
+        },
+      });
+      expect(test).to.throw(Error, /required/);
+    });
   });
 });
