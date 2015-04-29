@@ -25,7 +25,11 @@ export default class BaseModel {
         // Only set a default value if the data object doesn't have a property, or
         // the value of the property is null or undefined
         if ( defaultVal && ( !data.hasOwnProperty(k) || ( data.hasOwnProperty(k) && ( data[ k ] == null ) ) ) ) {
-          data[ k ] = defaultVal;
+          if ( typeof defaultVal === 'function' ) {
+            data[ k ] = defaultVal.apply(data);
+          } else {
+            data[ k ] = defaultVal;
+          }
         }
       });
     }
