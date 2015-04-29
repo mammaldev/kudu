@@ -46,8 +46,10 @@ export default {
       // schema should be a native constructor.
       if ( sub.hasOwnProperty('type') && val != null ) {
 
+        let type = sub.type.name || sub.type.constructor.name;
+
         try {
-          this[ `validate${ sub.type.name }`](val, sub);
+          this[ `validate${ type }`](val, sub);
         } catch ( err ) {
           throw new Error(`Property "${ key }": ${ err.message }`);
         }
@@ -77,6 +79,30 @@ export default {
     if ( isNaN(date.valueOf()) ) {
       throw new Error('Value is not of type date.');
     }
+
+    return true;
+  },
+
+  validateArray( value, schema ) {
+
+    // If the value is not an array we can fail straight away.
+    if ( !Array.isArray(value) ) {
+      throw new Error('Value is not of type array.');
+    }
+
+    // If the schema has an element at index 0 we treat that as a type and need
+    // to ensure that every element of the data array matches.
+    let arrayOf = schema.type[ 0 ];
+    let type = arrayOf.type.name || arrayOf.type.constructor.name;
+    let validator = this[ `validate${ type }`].bind(this);
+
+    value.forEach(( item, i ) => {
+      try {
+        validator(item);
+      } catch ( err ) {
+        throw new Error(`Element at index ${ i }: ${ err.message }`);
+      }
+    });
 
     return true;
   },

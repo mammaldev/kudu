@@ -133,4 +133,22 @@ describe('Kudu.Schema', () => {
       expect(test).to.throw(Error, /not of type/);
     });
   });
+
+  describe('#validateArray', () => {
+
+    it('should throw an error when the value is not an array', () => {
+      let test = () => Schema.validateArray('a');
+      expect(test).to.throw(Error, /not of type array/);
+    });
+
+    it('should throw an error when a data value is of the wrong type', () => {
+      let test = () => Schema.validateArray([ 1 ], { type: [ { type: String } ] });
+      expect(test).to.throw(Error, /not of type string/);
+    });
+
+    it('should accept an array of valid values', () => {
+      let arraySchema = { type: [ { type: Number } ] };
+      expect(Schema.validateArray([ 1, 2, 3 ], arraySchema)).to.equal(true);
+    });
+  });
 });
