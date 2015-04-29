@@ -16,8 +16,14 @@ export default class BaseModel {
     // have to do it manually.
     if ( data ) {
       Object.keys(data).forEach(( k ) => {
-        if ( properties[ k ].default && !data.hasOwnProperty(k) ) {
-          data[ k ] = properties[ k ].default;
+        let defaultVal;
+        try {
+          defaultVal = schema.properties[ k ].default;
+        } catch ( err ) {
+          throw new Error(`No property for "${ k }" found on schema definition`);
+        }
+        if ( defaultVal && !data.hasOwnProperty(k) ) {
+          data[ k ] = defaultVal;
         }
       });
     }
