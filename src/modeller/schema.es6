@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default {
 
   // Validate an object against a schema. Returns the same object after adding
@@ -29,6 +31,62 @@ export default {
       if ( sub.required === true && !data.hasOwnProperty(key) ) {
         throw new Error(`Property "${ key }" is required.`);
       }
+
+      let val = data[ key ];
+
+      // If a property has a 'type' and the data object includes that property,
+      // the value must be of the correct type. The 'type' property in the
+      // schema should be a native constructor.
+      if ( sub.hasOwnProperty('type') ) {
+
+        try {
+          this[ `validate${ sub.type.name }`](val, sub);
+        } catch ( err ) {
+          throw new Error(`Property "${ key }": ${ err.message }`);
+        }
+      }
     });
+  },
+
+  validateString( value ) {
+    return this.validateType(value, 'string');
+  },
+
+  validateNumber( value ) {
+    return this.validateType(value, 'number');
+  },
+
+  validateBoolean( value ) {
+    return this.validateType(value, 'boolean');
+  },
+
+  validateDate( value ) {
+
+    let type = Object.prototype.toString.call(value);
+    let date = type === '[object Date]' ? value : new Date(value);
+
+    if ( isNaN(date.valueOf()) ) {
+      throw new Error('Value is not of type date.');
+    }
+
+    return true;
+  },
+
+  validateType( value, type ) {
+
+    // Get the native type constructor. If we can't find one then assume we are
+    // attempting to validate an unknown type.
+    let Type = global[ _.capitalize(type) ];
+
+    if ( typeof Type !== 'function' ) {
+      throw new Error('Unknown type.');
+    }
+
+    // Validate type. Accepts literal values and boxed instances.
+    if ( typeof value !== type && !(value instanceof Type) ) {
+      throw new Error(`Value is not of type ${ type }.`);
+    }
+
+    return true;
   },
 };

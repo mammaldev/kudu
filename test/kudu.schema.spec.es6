@@ -38,4 +38,99 @@ describe('Kudu.Schema', () => {
       expect(test).to.throw(Error, /required/);
     });
   });
+
+  describe('#validateType', () => {
+
+    it('should throw an error when not passed a type', () => {
+      expect(Schema.validateType).to.throw(Error, /Unknown type/);
+    });
+
+    it('should throw an error when passed an invalid type', () => {
+      let test = () => Schema.validateType(1, 'invalid');
+      expect(test).to.throw(Error, /Unknown type/);
+    });
+
+    it('should throw an error when the type does not match', () => {
+      let test = () => Schema.validateType(1, 'string');
+      expect(test).to.throw(Error, /not of type/);
+    });
+
+    it('should return true when the value is a literal of valid type', () => {
+      expect(Schema.validateType(1, 'number')).to.equal(true);
+    });
+
+    it('should return true when the value is an instance of valid type', () => {
+      expect(Schema.validateType(new Number(1), 'number')).to.equal(true);
+    });
+  });
+
+  describe('#validateString', () => {
+
+    it('should throw an error when the value is not a string', () => {
+      let test = () => Schema.validateString(1);
+      expect(test).to.throw(Error, /not of type/);
+    });
+
+    it('should accept string literals', () => {
+      expect(Schema.validateString('a')).to.equal(true);
+    });
+
+    it('should accept String instances', () => {
+      expect(Schema.validateString(new String('a'))).to.equal(true);
+    });
+  });
+
+  describe('#validateNumber', () => {
+
+    it('should throw an error when the value is not a number', () => {
+      let test = () => Schema.validateNumber('a');
+      expect(test).to.throw(Error, /not of type/);
+    });
+
+    it('should accept numeric literals', () => {
+      expect(Schema.validateNumber(1)).to.equal(true);
+    });
+
+    it('should accept Number instances', () => {
+      expect(Schema.validateNumber(new Number(1))).to.equal(true);
+    });
+  });
+
+  describe('#validateBoolean', () => {
+
+    it('should throw an error when the value is not a number', () => {
+      let test = () => Schema.validateBoolean('a');
+      expect(test).to.throw(Error, /not of type/);
+    });
+
+    it('should accept boolean literals', () => {
+      expect(Schema.validateBoolean(true)).to.equal(true);
+    });
+
+    it('should accept Boolean instances', () => {
+      expect(Schema.validateBoolean(new Boolean(true))).to.equal(true);
+    });
+  });
+
+  describe('#validateDate', () => {
+
+    it('should throw an error when the value is not a date', () => {
+      let test = () => Schema.validateDate('a');
+      expect(test).to.throw(Error, /not of type/);
+    });
+
+    it('should accept valid date strings', () => {
+      expect(Schema.validateDate('2015-02-17T11:53:39.482Z')).to.equal(true);
+    });
+
+    it('should accept valid Date instances', () => {
+      let date = new Date('2015-02-17T11:53:39.482Z');
+      expect(Schema.validateDate(date)).to.equal(true);
+    });
+
+    it('should throw an error when the value is an invalid instance', () => {
+      let test = () => Schema.validateDate(new Date('invalid'));
+      expect(test).to.throw(Error, /not of type/);
+    });
+  });
 });
