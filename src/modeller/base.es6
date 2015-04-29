@@ -22,7 +22,9 @@ export default class BaseModel {
         } catch ( err ) {
           throw new Error(`No property for "${ k }" found on schema definition`);
         }
-        if ( defaultVal && !data.hasOwnProperty(k) ) {
+        // Only set a default value if the data object doesn't have a property, or
+        // the value of the property is null or undefined
+        if ( defaultVal && ( !data.hasOwnProperty(k) || ( data.hasOwnProperty(k) && ( data[ k ] == null ) ) ) ) {
           data[ k ] = defaultVal;
         }
       });
