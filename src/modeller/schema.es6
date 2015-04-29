@@ -34,10 +34,17 @@ export default {
 
       let val = data[ key ];
 
+      // If a property has a 'default' and the data object does not include
+      // that property (or includes it with the value of null or undefined) we
+      // add it with the default value.
+      if ( sub.hasOwnProperty('default') && val == null ) {
+        val = data[ key ] = sub.default;
+      }
+
       // If a property has a 'type' and the data object includes that property,
       // the value must be of the correct type. The 'type' property in the
       // schema should be a native constructor.
-      if ( sub.hasOwnProperty('type') ) {
+      if ( sub.hasOwnProperty('type') && val != null ) {
 
         try {
           this[ `validate${ sub.type.name }`](val, sub);
@@ -46,6 +53,8 @@ export default {
         }
       }
     });
+
+    return data;
   },
 
   validateString( value ) {

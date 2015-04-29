@@ -26,7 +26,7 @@ beforeEach(() => {
   app.model.create('Test', {
     properties: {
       id: {
-        type: 'integer',
+        type: Number,
         required: true
       }
     }
@@ -35,7 +35,7 @@ beforeEach(() => {
   app.model.create('HookTest', {
     properties: {
       id: {
-        type: 'integer',
+        type: Number,
         required: true
       }
     },
@@ -52,7 +52,7 @@ beforeEach(() => {
   let Unreq = app.model.create('Unrequestable', {
     properties: {
       id: {
-        type: 'integer',
+        type: Number,
         required: true
       }
     },
@@ -164,7 +164,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.post('/tests')
       .send({ id: 'invalid' })
-      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
+      .expect(400, 'Error: Property "id": Value is not of type number.', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
@@ -274,7 +274,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.put('/tests/1')
       .send({ id: 'invalid' })
-      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
+      .expect(400, 'Error: Property "id": Value is not of type number.', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
@@ -321,7 +321,7 @@ describe('Kudu.Router', () => {
     it('should fail with 400 when a model cannot be instantiated', ( done ) => {
       request.delete('/tests/1')
       .send({ id: 'invalid' })
-      .expect(400, 'Error: instance.id is not of a type(s) integer', done);
+      .expect(400, 'Error: Property "id": Value is not of type number.', done);
     });
 
     it('should fail with 500 when the database adapter throws/rejects', ( done ) => {
@@ -338,7 +338,7 @@ describe('Kudu.Router', () => {
       app.model.create('User', {
         properties: {
           id: {
-            type: 'integer',
+            type: Number,
             required: true
           }
         }
@@ -347,11 +347,11 @@ describe('Kudu.Router', () => {
       app.model.create('List', {
         properties: {
           id: {
-            type: 'integer',
+            type: Number,
             required: true
           },
           userId: {
-            type: 'integer',
+            type: Number,
             required: true
           }
         }
@@ -435,7 +435,7 @@ describe('Kudu.Router', () => {
       Test = app.model.create('Test', {
         properties: {
           id: {
-            type: 'integer',
+            type: Number,
             required: true
           }
         }

@@ -11,21 +11,23 @@ let InheritedUnrequestableModel;
 
 beforeEach(() => {
 
-  EmptyModel = new Model({});
+  EmptyModel = new Model({
+    properties: {}
+  });
 
   BasicModel = new Model({
     title: 'Test',
     properties: {
       id: {
-        type: 'integer',
+        type: Number,
         required: true
       },
       hidden: {
-        type: 'integer',
+        type: Number,
         public: false
       },
       defaults: {
-        type: 'string',
+        type: String,
         default: 'default'
       }
     }
@@ -35,7 +37,7 @@ beforeEach(() => {
   InheritedModel = new Model(BasicModel, {
     properties: {
       additional: {
-        type: 'string',
+        type: String,
         required: true
       }
     }
