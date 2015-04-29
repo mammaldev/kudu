@@ -306,6 +306,23 @@ export default class Router {
           return res.status(404).end();
         }
 
+        // If the request has included an entity tag in an If-Match header we
+        // need to compare its value against the tag we currently hold for the
+        // resource. If they don't match then there's a concurrency issue and
+        // we can't proceed.
+        let theirTag = req.header('if-match');
+        if ( theirTag ) {
+
+          let ourTag = saved.etag();
+          if ( `W/"${ theirTag }"` !== ourTag ) {
+
+            // If the ETag values don't match then it's likely the resource has
+            // already been updated by someone else. The HTTP spec states that
+            // a 412 (Precondition Failed) response must be sent in this case.
+            return res.status(412).end();
+          }
+        }
+
         // Save the instance in the database and send it back to the client.
         return kudu.db.update(instance);
       })
