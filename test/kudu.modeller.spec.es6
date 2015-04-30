@@ -43,8 +43,8 @@ describe('Kudu.Modeller', () => {
     });
 
     it('should accept a parent model by singular name', () => {
-      let Parent = model.create('parent', {});
-      let Child = model.create('child', {}, 'parent');
+      let Parent = model.create('parent', { properties: {} });
+      let Child = model.create('child', { properties: {} }, 'parent');
       let child = new Child({});
       expect(child).to.be.an.instanceOf(Parent);
     });

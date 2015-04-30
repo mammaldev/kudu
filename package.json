@@ -8,8 +8,7 @@
   },
   "main": "lib/kudu.js",
   "dependencies": {
-    "core-js": "^0.5.2",
-    "jsonschema": "^1.0.0",
+    "core-js": "^0.9.5",
     "lodash": "^3.2.0"
   },
   "devDependencies": {
