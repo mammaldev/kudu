@@ -59,6 +59,17 @@ describe('Kudu.Schema', () => {
         },
       })).to.deep.equal({ x: 5 });
     });
+
+    it('should use the return value of a default function', () => {
+      expect(validate({}, {
+        properties: {
+          x: {
+            type: Number,
+            default: () => 10,
+          },
+        },
+      })).to.deep.equal({ x: 10 });
+    });
   });
 
   describe('#validateType', () => {

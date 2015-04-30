@@ -14,6 +14,7 @@ import _ from 'lodash';
 //         type: [                   For an array use array literal as 'type'
 //           {
 //             type: Number,         First element restricts type of values
+//             default: () => 5      Defaults can be returned from functions
 //           },
 //         ],
 //       },
@@ -156,7 +157,15 @@ function validateObject( obj, schema ) {
     // property (or includes it with the value of null or undefined) we add it
     // with the default value.
     if ( sub.hasOwnProperty('default') && val == null ) {
-      val = obj[ key ] = sub.default;
+
+      // If the 'default' value is a function we invoke it and use the return
+      // value as the actual default.
+      let defaultVal = sub.default;
+      if ( typeof defaultVal === 'function' ) {
+        defaultVal = defaultVal();
+      }
+
+      val = obj[ key ] = defaultVal;
     }
 
     // If a property has a 'type' and the data object includes that property,
