@@ -1,5 +1,41 @@
 import _ from 'lodash';
 
+// Model schemas take inspiration from Mongoose and allow deep nesting of
+// objects and arrays. See http://mongoosejs.com/docs/guide.html for more
+// details.
+//
+//   let schema = {
+//     properties: {                 A 'properties' key is required
+//       title: {                    Each property of that is a model property
+//         type: String,             Types are specified by native constructors
+//         default: 'Untitled',      Default values are optional
+//       },
+//       numbers: {
+//         type: [                   For an array use array literal as 'type'
+//           {
+//             type: Number,         First element restricts type of values
+//           },
+//         ],
+//       },
+//       items: {
+//         type: {                   For an object use object literal as 'type'
+//           name: {
+//             type: String,
+//           },
+//         },
+//       },
+//     },
+//   };
+//
+// Supported types:
+//
+//   - String
+//   - Number
+//   - Boolean
+//   - Date
+//   - Array
+//   - Object
+//
 let Schema = {
 
   // Validate an object against a schema. Returns the same object after adding
