@@ -190,5 +190,21 @@ describe('Kudu.Schema', () => {
       let objectSchema = { x: { type: Number } };
       expect(Schema.validateObject({ x: 1 }, objectSchema)).to.equal(true);
     });
+
+    it('should recursively validate nested objects', () => {
+      let test = () => {
+        let data = { x: { y: 1 } };
+        Schema.validateObject(data, {
+          x: {
+            type: {
+              y: {
+                type: String,
+              },
+            },
+          },
+        });
+      };
+      expect(test).to.throw(Error, /not of type string/);
+    });
   });
 });

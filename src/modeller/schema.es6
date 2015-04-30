@@ -130,6 +130,11 @@ function validateObject( obj, schema ) {
 
       let type = sub.type.name || sub.type.constructor.name;
 
+      // If the 'type' is an object literal we treat it like a nested schema.
+      if ( type === 'Object' ) {
+        sub = sub.type;
+      }
+
       try {
         Schema[ `validate${ type }`](val, sub);
       } catch ( err ) {
