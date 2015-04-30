@@ -37,6 +37,28 @@ describe('Kudu.Schema', () => {
       });
       expect(test).to.throw(Error, /required/);
     });
+
+    it('should add missing default values', () => {
+      expect(validate({}, {
+        properties: {
+          x: {
+            type: Number,
+            default: 10,
+          },
+        },
+      })).to.deep.equal({ x: 10 });
+    });
+
+    it('should not add default values when a value already exists', () => {
+      expect(validate({ x: 5 }, {
+        properties: {
+          x: {
+            type: Number,
+            default: 10,
+          },
+        },
+      })).to.deep.equal({ x: 5 });
+    });
   });
 
   describe('#validateType', () => {
@@ -149,6 +171,24 @@ describe('Kudu.Schema', () => {
     it('should accept an array of valid values', () => {
       let arraySchema = { type: [ { type: Number } ] };
       expect(Schema.validateArray([ 1, 2, 3 ], arraySchema)).to.equal(true);
+    });
+  });
+
+  describe('#validateObject', () => {
+
+    it('should throw an error when the value is not an object', () => {
+      let test = () => Schema.validateObject('a');
+      expect(test).to.throw(Error, /not of type object/);
+    });
+
+    it('should throw an error when a property is of the wrong type', () => {
+      let test = () => Schema.validateObject({ x: 1 }, { x: { type: String } });
+      expect(test).to.throw(Error, /not of type string/);
+    });
+
+    it('should accept an object of valid values', () => {
+      let objectSchema = { x: { type: Number } };
+      expect(Schema.validateObject({ x: 1 }, objectSchema)).to.equal(true);
     });
   });
 });
