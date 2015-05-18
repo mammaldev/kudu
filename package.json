@@ -15,8 +15,8 @@
     "babel": "^5.1.10",
     "babel-eslint": "^3.0.1",
     "body-parser": "^1.10.0",
-    "chai": "^1.10.0",
-    "eslint": "^0.15.1",
+    "chai": "^2.3.0",
+    "eslint": "^0.21.1",
     "express": "^4.0.0",
     "mocha": "^2.0.1",
     "supertest": "^0.15.0"

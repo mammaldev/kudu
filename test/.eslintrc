@@ -1,6 +1,7 @@
 {
   "rules": {
-    "handle-callback-err": 0
+    "handle-callback-err": 0,
+    "no-new-wrappers": 0
   },
   "globals": {
     "beforeEach": false,
