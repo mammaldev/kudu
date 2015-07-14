@@ -2,12 +2,22 @@ import { validate } from './schema';
 
 export default class BaseModel {
 
-  constructor( data ) {
+  constructor( data, type ) {
 
     // Ensure data has been provided to the constructor. All model instances
     // must be created with initial data matching the schema.
     if ( typeof data !== 'object' ) {
       throw new Error('No instance data provided.');
+    }
+
+    // If a 'type' is specified on the data object it must match the type we
+    // are attempting to instantiate. If it isn't specified we need to add it.
+    if ( data.type !== undefined && data.type !== type ) {
+      throw new Error('Type mismatch.');
+    }
+
+    if ( data.type === undefined ) {
+      data.type = type;
     }
 
     // Validate the provided data against the schema. The result of validation

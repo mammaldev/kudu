@@ -35,7 +35,9 @@ export default class MockAdapter {
   }
 
   getAll( type ) {
-    return new Promise(( resolve ) => resolve(this.cache[ type ] || []));
+    return new Promise(( resolve ) => resolve({
+      rows: this.cache[ type ] || [],
+    }));
   }
 
   getDescendants( ancestorType, ancestorId, descendantType ) {
@@ -46,6 +48,11 @@ export default class MockAdapter {
       }
 
       let relation = this.relationships[ ancestorType ][ descendantType ];
+
+      if ( !this.cache[ descendantType ] ) {
+        descendantType = descendantType.substring(0, descendantType.length - 1);
+      }
+
       let instances = this.cache[ descendantType ].filter(( m ) => {
         return m[ relation ] === +ancestorId;
       });

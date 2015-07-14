@@ -30,20 +30,20 @@ export default class Modeller {
     }
 
     let Constructor;
+    singular = singular.toLowerCase();
+    plural = plural.toLowerCase();
 
     // If the model inherits from another we get the parent constructor and
     // pass it through to Kudu.Model. The Kudu.Model constructor is overloaded
     // hence the separate invocations.
     if ( typeof parent === 'string' ) {
       parent = this.get(parent);
-      Constructor = new Model(parent, schema);
+      Constructor = new Model(singular, parent, schema);
     } else {
-      Constructor = new Model(schema);
+      Constructor = new Model(singular, schema);
     }
 
     // Expose the singular and plural names on the constructor.
-    singular = singular.toLowerCase();
-    plural = plural.toLowerCase();
     [ Constructor.singular, Constructor.plural ] = [ singular, plural ];
 
     // Expose any hook functions on the constructor.

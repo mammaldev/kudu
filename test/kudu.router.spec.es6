@@ -188,8 +188,8 @@ describe('Kudu.Router', () => {
 
     beforeEach(( done ) => {
       Promise.all([
-        app.db.create({ type: 'tests', id: 1 }),
-        app.db.create({ type: 'tests', id: 2 })
+        app.db.create({ type: 'test', id: 1 }),
+        app.db.create({ type: 'test', id: 2 })
       ])
       .then(() => done());
     });
@@ -364,10 +364,10 @@ describe('Kudu.Router', () => {
       });
 
       Promise.all([
-        app.db.create({ type: 'users', id: 1 }),
-        app.db.create({ type: 'users', id: 2 }),
-        app.db.create({ type: 'lists', id: 4, userId: 1 }),
-        app.db.create({ type: 'lists', id: 5, userId: 1 })
+        app.db.create({ type: 'user', id: 1 }),
+        app.db.create({ type: 'user', id: 2 }),
+        app.db.create({ type: 'list', id: 4, userId: 1 }),
+        app.db.create({ type: 'list', id: 5, userId: 1 })
       ])
       .then(() => done());
     });

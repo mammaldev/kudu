@@ -3,7 +3,7 @@ import BaseModel from './base';
 
 export default class Model {
 
-  constructor( ToExtend, schema ) {
+  constructor( type, ToExtend, schema ) {
 
     // Ensure a schema is present. We can't create instances without something
     // to validate them against.
@@ -40,7 +40,7 @@ export default class Model {
       }
 
       constructor( data ) {
-        super(data);
+        super(data, type);
       }
     }
 

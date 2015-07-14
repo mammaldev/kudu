@@ -11,11 +11,11 @@ let InheritedUnrequestableModel;
 
 beforeEach(() => {
 
-  EmptyModel = new Model({
+  EmptyModel = new Model('empty', {
     properties: {}
   });
 
-  BasicModel = new Model({
+  BasicModel = new Model('basic', {
     title: 'Test',
     properties: {
       id: {
@@ -34,7 +34,7 @@ beforeEach(() => {
   });
   BasicModel.prototype.someMethod = () => 1;
 
-  InheritedModel = new Model(BasicModel, {
+  InheritedModel = new Model('inherited', BasicModel, {
     properties: {
       additional: {
         type: String,
@@ -44,7 +44,7 @@ beforeEach(() => {
   });
   InheritedModel.prototype.anotherMethod = () => 2;
 
-  UnrequestableModel = new Model({
+  UnrequestableModel = new Model('unrequestable', {
     properties: {},
     requestable: false
   });
@@ -96,6 +96,15 @@ describe('Kudu.Model', () => {
 
     it('should receive default values for missing properties', () => {
       expect(new BasicModel({ id: 1 })).to.have.property('defaults', 'default');
+    });
+
+    it('should receive a type when one is not provided', () => {
+      expect(new BasicModel({ id: 2 })).to.have.property('type', 'basic');
+    });
+
+    it('should throw an error when the wrong type is provided', () => {
+      let test = () => new BasicModel({ id: 3, type: 'wrong' });
+      expect(test).to.throw(Error, /mismatch/);
     });
 
     it('should not use default values when property is present', () => {
