@@ -233,7 +233,7 @@ export default class Router {
 
       // Save the instance in the database and send it back to the client.
       kudu.db.create(instance)
-      .then(() => res.status(201).json(instance))
+      .then(( data ) => res.status(201).json(data))
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
 
@@ -298,7 +298,7 @@ export default class Router {
         // Save the instance in the database and send it back to the client.
         return kudu.db.update(instance);
       })
-      .then(() => res.status(200).json(instance))
+      .then(( updated ) => res.status(200).json(updated))
       .catch(self.genericErrorHandler.bind(self, req, res));
     }
 
