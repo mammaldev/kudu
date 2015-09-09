@@ -251,7 +251,7 @@ export default class Router {
       let id = req.params.id;
 
       if ( id ) {
-        return kudu.db.get(type, id)
+        return kudu.db.get(Model, id)
         .then(( data ) => {
 
           if ( !data ) {
@@ -265,7 +265,7 @@ export default class Router {
       }
 
       // If no identifier is present we need all instances
-      kudu.db.getAll(type)
+      kudu.db.getAll(Model)
       .then(( data ) => {
 
         let instances = data.map(( item ) => new Model(item));
@@ -277,15 +277,17 @@ export default class Router {
     function handlePut( req, res ) {
 
       let instance = req.instance;
+      let type = req.params.type;
+      let [ Model ] = self[ getModels ](type);
 
-      if ( !instance ) {
-        res.status(404).end();
+      if ( !instance || !Model ) {
+        return res.status(404).end();
       }
 
       // Retrieve the corresponding instance from the database. Since PUT is
       // intended to update an existing resource we need to ensure the resource
       // does actually exist.
-      kudu.db.get(req.params.type, req.params.id)
+      kudu.db.get(Model, req.params.id)
       .then(( saved ) => {
 
         // If the resource in question is not already stored then we can't

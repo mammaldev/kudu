@@ -237,8 +237,8 @@ describe('Kudu.Router', () => {
 
     beforeEach(( done ) => {
       Promise.all([
-        app.db.create({ type: 'tests', id: 1 }),
-        app.db.create({ type: 'hooktests', id: 1 }),
+        app.db.create({ type: 'test', id: 1 }),
+        app.db.create({ type: 'hooktest', id: 1 }),
       ])
       .then(() => done());
     });

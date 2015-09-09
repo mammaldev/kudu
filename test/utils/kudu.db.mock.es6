@@ -22,7 +22,8 @@ export default class MockAdapter {
     });
   }
 
-  get( type, id ) {
+  get( Model, id ) {
+    let type = Model.singular;
     return new Promise(( resolve, reject ) => {
 
       if ( id === 'throw' ) {
@@ -34,10 +35,9 @@ export default class MockAdapter {
     });
   }
 
-  getAll( type ) {
-    return new Promise(( resolve ) => resolve({
-      rows: this.cache[ type ] || [],
-    }));
+  getAll( Model ) {
+    let type = Model.singular;
+    return new Promise(( resolve ) => resolve(this.cache[ type ]));
   }
 
   getDescendants( ancestorType, ancestorId, descendantType ) {
