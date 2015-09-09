@@ -20,24 +20,24 @@ beforeEach(() => {
   expressApp.use(json());
 
   app = new Kudu(expressApp, {
-    databaseAdapter: MockAdapter
+    databaseAdapter: MockAdapter,
   });
 
   app.model.create('Test', {
     properties: {
       id: {
         type: Number,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   });
 
   app.model.create('HookTest', {
     properties: {
       id: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     },
     hooks: {
       post ( obj ) {
@@ -45,22 +45,22 @@ beforeEach(() => {
       },
       put( obj ) {
         obj.hooked = true;
-      }
-    }
+      },
+    },
   });
 
   let Unreq = app.model.create('Unrequestable', {
     properties: {
       id: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     },
-    requestable: false
+    requestable: false,
   });
 
   app.model.create('Requestable', {
-    properties: {}
+    properties: {},
   }, Unreq);
 
   app.router.handle('GET', '/handle', ( req, res ) => {
@@ -88,8 +88,8 @@ describe('Kudu.Router', () => {
     let app = new Kudu(expressApp, {
       databaseAdapter: MockAdapter,
       router: {
-        baseURL: '/api'
-      }
+        baseURL: '/api',
+      },
     });
     let request = supertest(expressApp);
 
@@ -105,13 +105,13 @@ describe('Kudu.Router', () => {
     let app = new Kudu(expressApp, {
       databaseAdapter: MockAdapter,
       router: {
-        baseURL: '/api'
-      }
+        baseURL: '/api',
+      },
     });
     let request = supertest(expressApp);
 
     app.router.handle('GET', '/handle', {
-      ignoreBaseURL: true
+      ignoreBaseURL: true,
     }, ( req, res ) => res.status(200).end());
 
     request.get('/handle')
@@ -189,7 +189,7 @@ describe('Kudu.Router', () => {
     beforeEach(( done ) => {
       Promise.all([
         app.db.create({ type: 'test', id: 1 }),
-        app.db.create({ type: 'test', id: 2 })
+        app.db.create({ type: 'test', id: 2 }),
       ])
       .then(() => done());
     });
@@ -339,35 +339,35 @@ describe('Kudu.Router', () => {
         properties: {
           id: {
             type: Number,
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
       app.model.create('List', {
         properties: {
           id: {
             type: Number,
-            required: true
+            required: true,
           },
           userId: {
             type: Number,
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
       app.db.configureRelationships({
         users: {
-          lists: 'userId'
-        }
+          lists: 'userId',
+        },
       });
 
       Promise.all([
         app.db.create({ type: 'user', id: 1 }),
         app.db.create({ type: 'user', id: 2 }),
         app.db.create({ type: 'list', id: 4, userId: 1 }),
-        app.db.create({ type: 'list', id: 5, userId: 1 })
+        app.db.create({ type: 'list', id: 5, userId: 1 }),
       ])
       .then(() => done());
     });
@@ -436,9 +436,9 @@ describe('Kudu.Router', () => {
         properties: {
           id: {
             type: Number,
-            required: true
-          }
-        }
+            required: true,
+          },
+        },
       });
 
       request = supertest(expressApp);

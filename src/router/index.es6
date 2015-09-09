@@ -5,7 +5,7 @@ export default class Router {
 
   get [ defaults ]() {
     return {
-      baseURL: ''
+      baseURL: '',
     };
   }
 

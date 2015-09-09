@@ -12,7 +12,7 @@ let InheritedUnrequestableModel;
 beforeEach(() => {
 
   EmptyModel = new Model('empty', {
-    properties: {}
+    properties: {},
   });
 
   BasicModel = new Model('basic', {
@@ -20,17 +20,17 @@ beforeEach(() => {
     properties: {
       id: {
         type: Number,
-        required: true
+        required: true,
       },
       hidden: {
         type: Number,
-        public: false
+        public: false,
       },
       defaults: {
         type: String,
-        default: 'default'
-      }
-    }
+        default: 'default',
+      },
+    },
   });
   BasicModel.prototype.someMethod = () => 1;
 
@@ -38,19 +38,19 @@ beforeEach(() => {
     properties: {
       additional: {
         type: String,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   });
   InheritedModel.prototype.anotherMethod = () => 2;
 
   UnrequestableModel = new Model('unrequestable', {
     properties: {},
-    requestable: false
+    requestable: false,
   });
 
   InheritedUnrequestableModel = new Model(UnrequestableModel, {
-    properties: {}
+    properties: {},
   });
 });
 
@@ -110,7 +110,7 @@ describe('Kudu.Model', () => {
     it('should not use default values when property is present', () => {
       expect(new BasicModel({
         id: 1,
-        defaults: 'present'
+        defaults: 'present',
       })).to.have.property('defaults', 'present');
     });
 
@@ -124,7 +124,7 @@ describe('Kudu.Model', () => {
     it('should inherit properties from the parent model', () => {
       expect(new InheritedModel({
         id: 1,
-        additional: '1'
+        additional: '1',
       })).to.have.property('id', 1);
     });
 
@@ -161,7 +161,7 @@ describe('Kudu.Model', () => {
     beforeEach(() => {
       instance = new BasicModel({
         id: 1,
-        hidden: 2
+        hidden: 2,
       });
     });
 
