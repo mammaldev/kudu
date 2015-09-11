@@ -37,6 +37,18 @@ describe('Kudu', () => {
     });
   });
 
+  describe('#getModel', () => {
+
+    it('should return a model constructor from the model cache', () => {
+      let Model = kudu.createModel('test', {});
+      expect(kudu.getModel('test')).to.equal(Model);
+    });
+
+    it('should return undefined when no model matches the given name', () => {
+      expect(kudu.getModel('fail')).to.be.undefined;
+    });
+  });
+
   describe('Model', () => {
 
     it('should expose the singular name on the constructor', () => {

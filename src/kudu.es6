@@ -58,4 +58,14 @@ export default class Kudu {
 
     return Model;
   }
+
+  // Get a model constructor previously created with Kudu#createModel.
+  //
+  // Arguments:
+  //
+  //   singular    {String}    The name of the model in singular form.
+  //
+  getModel( singular ) {
+    return this.models.get(singular);
+  }
 }
