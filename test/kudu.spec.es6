@@ -35,6 +35,11 @@ describe('Kudu', () => {
       let Model = kudu.createModel('test', {});
       expect(kudu.models.get('test')).to.equal(Model);
     });
+
+    it('should add the model to the pluralised model cache', () => {
+      let Model = kudu.createModel('test', {});
+      expect(kudu.modelsByPluralName.get('tests')).to.equal(Model);
+    });
   });
 
   describe('#getModel', () => {

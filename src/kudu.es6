@@ -8,8 +8,10 @@ export default class Kudu {
     this.app = app;
 
     // Create the model store. All models created for this app will be
-    // referenced from this object.
+    // referenced from this object. Since models have both a singular and
+    // plural name we have two stores, each keyed by one form.
     this.models = new Map();
+    this.modelsByPluralName = new Map();
   }
 
   // Create a new model. The result will be a constructor function that can
@@ -52,9 +54,9 @@ export default class Kudu {
       }
     }
 
-    // Add the new model to the model cache. The singular name is always used
-    // as the key.
+    // Add the new model to the model cache.
     this.models.set(singular, Model);
+    this.modelsByPluralName.set(plural, Model);
 
     return Model;
   }
