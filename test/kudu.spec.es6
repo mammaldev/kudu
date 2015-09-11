@@ -1,5 +1,6 @@
 import chai from 'chai';
 import Kudu from '../src/kudu';
+import BaseModel from '../src/model';
 
 let expect = chai.expect;
 
@@ -46,6 +47,23 @@ describe('Kudu', () => {
     it('should default the plural name to singular name plus "s"', () => {
       let Model = kudu.createModel('test', {});
       expect(Model).to.have.property('plural', 'tests');
+    });
+  });
+
+  describe('Model instances', () => {
+
+    let Model;
+
+    beforeEach(() => {
+      Model = kudu.createModel('test', {});
+    });
+
+    it('should inherit from the base Model constructor', () => {
+      expect(new Model()).to.be.an.instanceOf(BaseModel);
+    });
+
+    it('should map provided data onto the instance', () => {
+      expect(new Model({ id: 1 })).to.have.property('id', 1);
     });
   });
 });

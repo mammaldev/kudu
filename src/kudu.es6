@@ -1,3 +1,5 @@
+import BaseModel from './model';
+
 export default class Kudu {
 
   constructor( app ) {
@@ -36,9 +38,14 @@ export default class Kudu {
 
     let kudu = this;
 
-    class Model {
+    class Model extends BaseModel {
+
       static singular = singular
       static plural = plural
+
+      constructor( data ) {
+        super(data);
+      }
     }
 
     return Model;
