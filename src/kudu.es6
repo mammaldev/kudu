@@ -6,6 +6,10 @@ export default class Kudu {
 
     // Keep a reference ot the server (usually an Express app).
     this.app = app;
+
+    // Create the model store. All models created for this app will be
+    // referenced from this object.
+    this.models = new Map();
   }
 
   // Create a new model. The result will be a constructor function that can
@@ -47,6 +51,10 @@ export default class Kudu {
         super(data);
       }
     }
+
+    // Add the new model to the model cache. The singular name is always used
+    // as the key.
+    this.models.set(singular, Model);
 
     return Model;
   }

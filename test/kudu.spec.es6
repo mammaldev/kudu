@@ -30,6 +30,11 @@ describe('Kudu', () => {
     it('should not treat a plural name as a schema', () => {
       expect(kudu.createModel('test', 'tests', {})).to.be.a('function');
     });
+
+    it('should add the model to the model cache', () => {
+      let Model = kudu.createModel('test', {});
+      expect(kudu.models.get('test')).to.equal(Model);
+    });
   });
 
   describe('Model', () => {
