@@ -104,6 +104,7 @@ describe('Kudu', () => {
       Model = kudu.createModel('test', {
         properties: {
           name: {
+            type: String,
             required: true,
           },
         },
@@ -114,6 +115,27 @@ describe('Kudu', () => {
       let instance = new Model();
       let test = () => validate(instance);
       expect(test).to.throw(Error, /required/);
+    });
+
+    describe('Strings', () => {
+
+      it('should throw an error when a property is not a string', () => {
+        let instance = new Model({ name: 1 });
+        let test = () => validate(instance);
+        expect(test).to.throw(Error, /must be of type/);
+      });
+
+      it('should not throw an error when a property is a string literal', () => {
+        let instance = new Model({ name: '1' });
+        let test = () => validate(instance);
+        expect(test).not.to.throw();
+      });
+
+      it('should not throw an error when a property is a String instance', () => {
+        let instance = new Model({ name: new String('1') });
+        let test = () => validate(instance);
+        expect(test).not.to.throw();
+      });
     });
   });
 });

@@ -22,6 +22,17 @@ export default ( model ) => {
     if ( rule.required === true && value === undefined ) {
       throw new Error(`Property '${ prop }' is required.`);
     }
+
+    // If the property is present on the instance its type must match that
+    // which is specified in the schema.
+    switch ( rule.type ) {
+
+    case String:
+      if ( typeof value !== 'string' && !( value instanceof String ) ) {
+        throw new Error(`Property '${ prop }' must be of type String.`);
+      }
+      break;
+    }
   });
 
   // If the model instance conforms to the schema we will reach this point
