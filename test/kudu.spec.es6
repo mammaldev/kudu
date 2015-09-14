@@ -1,6 +1,7 @@
 import chai from 'chai';
 import Kudu from '../src/kudu';
 import BaseModel from '../src/model';
+import validate from '../src/validate';
 
 let expect = chai.expect;
 
@@ -92,6 +93,27 @@ describe('Kudu', () => {
 
     it('should map provided data onto the instance', () => {
       expect(new Model({ id: 1 })).to.have.property('id', 1);
+    });
+  });
+
+  describe('Validator', () => {
+
+    let Model;
+
+    beforeEach(() => {
+      Model = kudu.createModel('test', {
+        properties: {
+          name: {
+            required: true,
+          },
+        },
+      });
+    });
+
+    it('should throw an error when a required property is not present', () => {
+      let instance = new Model();
+      let test = () => validate(instance);
+      expect(test).to.throw(Error, /required/);
     });
   });
 });
