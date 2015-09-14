@@ -70,6 +70,12 @@ describe('Kudu', () => {
       let Model = kudu.createModel('test', {});
       expect(Model).to.have.property('plural', 'tests');
     });
+
+    it('should expose the schema on the constructor', () => {
+      let schema = {};
+      let Model = kudu.createModel('test', schema);
+      expect(Model.schema).to.equal(schema);
+    });
   });
 
   describe('Model instances', () => {

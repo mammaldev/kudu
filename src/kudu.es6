@@ -48,6 +48,7 @@ export default class Kudu {
 
       static singular = singular
       static plural = plural
+      static schema = schema
 
       constructor( data ) {
         super(kudu, data);
