@@ -50,7 +50,7 @@ export default class Kudu {
       static plural = plural
 
       constructor( data ) {
-        super(data);
+        super(kudu, data);
       }
     }
 
