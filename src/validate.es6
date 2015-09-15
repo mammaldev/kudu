@@ -32,6 +32,24 @@ export default ( model ) => {
         throw new Error(`Property '${ prop }' must be of type String.`);
       }
       break;
+
+    case Number:
+      if ( typeof value !== 'number' && !( value instanceof Number ) ) {
+        throw new Error(`Property '${ prop }'' must be of type Number.`);
+      }
+      break;
+
+    case Boolean:
+      if ( typeof value !== 'boolean' && !( value instanceof Boolean ) ) {
+        throw new Error(`Property '${ prop }'' must be of type Boolean.`);
+      }
+      break;
+
+    case Object:
+      if ( typeof value !== 'object' || value === null ) {
+        throw new Error(`Property '${ prop }'' must be of type Object.`);
+      }
+      break;
     }
   });
 
