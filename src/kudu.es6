@@ -1,11 +1,27 @@
+import MemoryAdapter from './adapter';
 import BaseModel from './model';
 
 export default class Kudu {
 
-  constructor( app ) {
+  constructor( app, config = {} ) {
 
     // Keep a reference ot the server (usually an Express app).
     this.app = app;
+
+    // Set up the data access adapter. The adapter config must have a 'type'
+    // property that refers to a constructor function. If no adapter was
+    // specified we default to built-in in-memory storage.
+    if ( config.adapter && typeof config.adapter.type !== 'function' ) {
+      throw new Error('Adapter config must include a "type" constructor.');
+    } else {
+      config.adapter = {
+        type: MemoryAdapter,
+      };
+    }
+
+    // Instantiate the adapter, passing through any options specified for it
+    // and expose the instance on the Kudu app.
+    this.db = new config.adapter.type(config.adapter.config);
 
     // Create the model store. All models created for this app will be
     // referenced from this object. Since models have both a singular and

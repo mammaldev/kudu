@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Kudu from '../src/kudu';
 import BaseModel from '../src/model';
 import validate from '../src/validate';
+import MemoryAdapter from '../src/adapter';
 
 chai.use(chaiAsPromised);
 let expect = chai.expect;
@@ -17,6 +18,15 @@ describe('Kudu', () => {
 
   it('should expose a constructor function', () => {
     expect(Kudu).to.be.a('function');
+  });
+
+  it('should throw an error when given invalid adapter config', () => {
+    let test = () => new Kudu({}, { adapter: {} });
+    expect(test).to.throw(Error, /config/);
+  });
+
+  it('should expose an instance of the in-memory adapter by default', () => {
+    expect(kudu.db).to.be.an.instanceOf(MemoryAdapter);
   });
 
   describe('#createModel', () => {
