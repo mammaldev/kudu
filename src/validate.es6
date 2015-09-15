@@ -23,6 +23,12 @@ export default ( model ) => {
       throw new Error(`Property '${ prop }' is required.`);
     }
 
+    // If the property is not required and the value is not present we don't
+    // need to try any other validation.
+    if ( value === undefined ) {
+      return true;
+    }
+
     // If the property is present on the instance its type must match that
     // which is specified in the schema.
     switch ( rule.type ) {

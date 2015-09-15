@@ -104,7 +104,11 @@ describe('Kudu', () => {
       Model = kudu.createModel('test', {
         properties: {
           name: {
+            type: String,
             required: true,
+          },
+          test: {
+            type: String,
           },
         },
       });
@@ -114,6 +118,12 @@ describe('Kudu', () => {
       let instance = new Model();
       let test = () => validate(instance);
       expect(test).to.throw(Error, /required/);
+    });
+
+    it('should not throw an error when a non-required property is not present', () => {
+      let instance = new Model({ name: 'test' });
+      let test = () => validate(instance);
+      expect(test).not.to.throw(Error);
     });
 
     describe('Strings', () => {
