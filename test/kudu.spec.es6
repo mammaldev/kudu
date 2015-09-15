@@ -1,8 +1,10 @@
 import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import Kudu from '../src/kudu';
 import BaseModel from '../src/model';
 import validate from '../src/validate';
 
+chai.use(chaiAsPromised);
 let expect = chai.expect;
 
 describe('Kudu', () => {
@@ -76,6 +78,37 @@ describe('Kudu', () => {
       let schema = {};
       let Model = kudu.createModel('test', schema);
       expect(Model.schema).to.equal(schema);
+    });
+
+    describe('#save', () => {
+
+      let Model;
+
+      beforeEach(() => {
+        Model = kudu.createModel('test', {
+          properties: {
+            name: {
+              type: String,
+              required: true,
+            },
+          },
+        });
+      });
+
+      it('should return a promise', () => {
+        let instance = new Model();
+        expect(instance.save()).to.be.an.instanceOf(Promise);
+      });
+
+      it('should fail when the model is invalid', () => {
+        let instance = new Model();
+        return expect(instance.save()).to.be.rejectedWith(Error, /required/);
+      });
+
+      it('should succeed when the model is valid', () => {
+        let instance = new Model({ name: 'test' });
+        return expect(instance.save()).to.be.fulfilled;
+      });
     });
   });
 
