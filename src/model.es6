@@ -24,7 +24,18 @@ export default class BaseModel {
       return Promise.reject(err);
     }
 
-    // If we reached this point the the model is valid.
-    return Promise.resolve();
+    // If we reached this point the the model is valid. We pass it off to the
+    // adapter to persist. The adapter method must return a promise that will
+    // resolve to an object representing this model instance.
+    return this.app.db.create(this)
+    .then(( result ) => {
+
+      // Merge the object returned from the adapter with this model instance to
+      // bring in any new properties added by the adapter (such as a generated
+      // identifier).
+      Object.keys(result).forEach(( key ) => this[ key ] = result[ key ]);
+
+      return this;
+    });
   }
 }
