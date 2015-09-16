@@ -47,4 +47,35 @@ export default class MemoryAdapter {
     modelStore.set(instance.id, instance);
     return Promise.resolve(instance);
   }
+
+  // Get a specific Kudu model instance by unique identifier.
+  //
+  // Arguments:
+  //   type    {String}           The type of the model to be retrieved.
+  //   id      {Number|String}    The unique identifer of a model instance to
+  //                              be retrieved.
+  //
+  get( type, id ) {
+
+    // If we don't have a type or an identifer we can't find a model instance.
+    if ( typeof type !== 'string' || !type ) {
+      return Promise.reject(new Error('Expected a model type.'));
+    }
+
+    if ( id === undefined ) {
+      return Promise.reject(new Error('Expected a model identifier.'));
+    }
+
+    // If a store for the requested model type doesn't exist then the specific
+    // instance can't exist either so we return nothing.
+    let modelStore = this.store.get(type);
+
+    if ( !(modelStore instanceof Map) ) {
+      return Promise.resolve();
+    }
+
+    // Get the requested instance from the model store. If it exists we return
+    // it but if not we just return nothing.
+    return Promise.resolve(modelStore.get(id));
+  }
 }

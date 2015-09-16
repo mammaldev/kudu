@@ -66,6 +66,17 @@ export default class Kudu {
       static plural = plural
       static schema = schema
 
+      // Find an instance of this model by unique identifier.
+      static get( id ) {
+
+        // If we don't have an identifer we can't find a model instance.
+        if ( id === undefined ) {
+          return Promise.reject(new Error('Expected a model identifier'));
+        }
+
+        return kudu.db.get(singular, id);
+      }
+
       constructor( data ) {
         super(kudu, data);
       }

@@ -35,6 +35,21 @@ describe('Model', () => {
     expect(Model.schema).to.equal(schema);
   });
 
+  describe('static get', () => {
+
+    let Model;
+
+    beforeEach(() => {
+      Model = kudu.createModel('test', {
+        properties: {},
+      });
+    });
+
+    it('should fail when no identifier is provided', () => {
+      return expect(Model.get()).to.be.rejectedWith(Error, /identifier/);
+    });
+  });
+
   describe('instances', () => {
 
     let Model;
@@ -52,7 +67,7 @@ describe('Model', () => {
     });
   });
 
- describe('#save', () => {
+  describe('#save', () => {
 
     let Model;
 

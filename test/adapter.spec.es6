@@ -32,4 +32,29 @@ describe('MemoryAdapter', () => {
       return expect(adapter.create(instance)).to.eventually.have.property('id');
     });
   });
+
+  describe('#get', () => {
+
+    it('should throw an error when not passed a type', () => {
+      return expect(adapter.get()).to.be.rejectedWith(Error, /type/);
+    });
+
+    it('should throw an error when not passed an identifier', () => {
+      return expect(adapter.get('test')).to.be.rejectedWith(Error, /identifier/);
+    });
+
+    it('should return undefined when a type does not exist', () => {
+      return expect(adapter.get('test', 1)).to.eventually.be.undefined;
+    });
+
+    it('should return undefined when an identifier does not exist', () => {
+      adapter.create({ type: 'test', id: 1 });
+      return expect(adapter.get('test', 2)).to.eventually.be.undefined;
+    });
+
+    it('should return an object when an identifier is found', () => {
+      adapter.create({ type: 'test', id: 1 });
+      return expect(adapter.get('test', 1)).to.eventually.have.property('id', 1);
+    });
+  });
 });
