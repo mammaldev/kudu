@@ -19,13 +19,13 @@ export default class MemoryAdapter {
 
     // If we don't have an instance then there's nothing to persist.
     if ( typeof instance !== 'object' ) {
-      throw new Error('Expected a model instance to create.');
+      return Promise.reject(new Error('Expected a model instance to create.'));
     }
 
     // If the instance does not have a "type" property we don't know where to
     // persist it.
     if ( instance.type === undefined ) {
-      throw new Error('Expected a "type" property.');
+      return Promise.reject(new Error('Expected a "type" property.'));
     }
 
     // Generate a unique identifier for the model instance if it doesn't have

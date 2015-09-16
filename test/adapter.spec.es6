@@ -20,8 +20,7 @@ describe('MemoryAdapter', () => {
   describe('#create', () => {
 
     it('should throw an error when not passed an object', () => {
-      let test = () => adapter.create();
-      expect(test).to.throw(Error, /model instance/);
+      return expect(adapter.create()).to.be.rejectedWith(Error, /model instance/);
     });
 
     it('should return a promise', () => {
@@ -29,7 +28,8 @@ describe('MemoryAdapter', () => {
     });
 
     it('should generate an identifier and attach it to the result', () => {
-      return expect(adapter.create({})).to.eventually.have.property('id');
+      let instance = { type: 'test' };
+      return expect(adapter.create(instance)).to.eventually.have.property('id');
     });
   });
 });
