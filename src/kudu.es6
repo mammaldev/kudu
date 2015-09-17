@@ -1,5 +1,6 @@
 import MemoryAdapter from './adapter';
 import BaseModel from './model';
+import Router from './router';
 
 export default class Kudu {
 
@@ -28,6 +29,10 @@ export default class Kudu {
     // plural name we have two stores, each keyed by one form.
     this.models = new Map();
     this.modelsByPluralName = new Map();
+
+    // Create a Router instance for this app, passing through any configuration
+    // provided for it.
+    this.router = new Router(this, config.router);
   }
 
   // Create a new model. The result will be a constructor function that can
@@ -97,5 +102,11 @@ export default class Kudu {
   //
   getModel( singular ) {
     return this.models.get(singular);
+  }
+
+  // Set up generic API route handlers on the Express app registered with the
+  // Kudu instance. Proxy for Router#createGenericRoutes
+  createGenericRoutes() {
+    this.router.createGenericRoutes();
   }
 }
