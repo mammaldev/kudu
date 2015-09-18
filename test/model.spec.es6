@@ -92,6 +92,11 @@ describe('Model', () => {
       return expect(instance.save()).to.be.rejectedWith(Error, /required/);
     });
 
+    it('should add a "type" property when one is not present', () => {
+      let instance = new Model({ name: 'test' });
+      return expect(instance.save()).to.eventually.have.property('type', 'test');
+    });
+
     it('should succeed when the model is valid', () => {
       let instance = new Model({ type: 'test', name: 'test' });
       return expect(instance.save()).to.be.fulfilled;

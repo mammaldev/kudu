@@ -24,6 +24,13 @@ export default class BaseModel {
       return Promise.reject(err);
     }
 
+    // If the instance does not have a "type" property we add one to it with
+    // the singular model name as the value. This is used by the adapter to
+    // determine where to persist the instance.
+    if ( this.type === undefined ) {
+      this.type = this.constructor.singular;
+    }
+
     // If we reached this point the the model is valid. We pass it off to the
     // adapter to persist. The adapter method must return a promise that will
     // resolve to an object representing this model instance.
