@@ -78,4 +78,31 @@ export default class MemoryAdapter {
     // it but if not we just return nothing.
     return Promise.resolve(modelStore.get(id));
   }
+
+  // Get a list of Kudu model instances by type.
+  //
+  // Arguments:
+  //   type    {String}    The type of the models to be retrieved.
+  //
+  getAll( type ) {
+
+    // If we don't have a type we can't find any model instances.
+    if ( typeof type !== 'string' || !type ) {
+      return Promise.reject(new Error('Expected a model type.'));
+    }
+
+    // If a store for the requested model type doesn't exist we return an empty
+    // array.
+    let modelStore = this.store.get(type);
+
+    if ( !(modelStore instanceof Map) ) {
+      return Promise.resolve([]);
+    }
+
+    // Build an array containing all instances of the model. Creating an array
+    // from a map results in an array in which each element is another array
+    // representing a key-value pair from the map. We only care about the
+    // values.
+    return Promise.resolve(Array.from(modelStore).map(( i ) => i[ 1 ]));
+  }
 }

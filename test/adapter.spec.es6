@@ -57,4 +57,22 @@ describe('MemoryAdapter', () => {
       return expect(adapter.get('test', 1)).to.eventually.have.property('id', 1);
     });
   });
+
+  describe('#getAll', () => {
+
+    it('should throw an error when not passed a type', () => {
+      return expect(adapter.getAll()).to.be.rejectedWith(Error, /type/);
+    });
+
+    it('should return an empty array when a type does not exist', () => {
+      return expect(adapter.getAll('test')).to.eventually.deep.equal([]);
+    });
+
+    it('should return an array of instances', () => {
+      adapter.create({ type: 'test', id: 1 });
+      return expect(adapter.getAll('test')).to.eventually.deep.equal([
+        { type: 'test', id: 1 },
+      ]);
+    });
+  });
 });
