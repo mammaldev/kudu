@@ -12,6 +12,7 @@ import Router from '../src/router';
 let expect = chai.expect;
 let expressApp;
 let request;
+let Model;
 let app;
 
 describe('Router', () => {
@@ -20,7 +21,7 @@ describe('Router', () => {
     expressApp = express();
     expressApp.use(json());
     app = new Kudu(expressApp);
-    app.createModel('test', {
+    Model = app.createModel('test', {
       properties: {
         name: {
           type: String,
@@ -57,6 +58,58 @@ describe('Router', () => {
           return done(err);
         }
         expect(JSON.parse(res.body)).to.have.property('name', 'test');
+        done();
+      });
+    });
+  });
+
+  describe('generic GET handler', () => {
+
+    it('should 404 when the URL does not correspond to a model', ( done ) => {
+      request.get('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the identifier does not correspond to a model', ( done ) => {
+      request.get('/tests/1').send().expect(404, done);
+    });
+
+    it('should 200 with the serialized model instance when a valid identifier is present', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.get('/tests/1').send().expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(JSON.parse(res.body)).to.have.property('name', 'test');
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
+    });
+
+    it('should 200 with a serialized array of model instances when no identifier is present', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.get('/tests').send().expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(JSON.parse(res.body)).to.be.an('array').and.to.have.length(1);
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
+    });
+
+    it('should 200 with an empty array when no identifier is present and no models exist', ( done ) => {
+      request.get('/tests').send().expect(200)
+      .end(( err, res ) => {
+        if ( err ) {
+          throw err;
+        }
+        expect(JSON.parse(res.body)).to.be.an('array').and.to.have.length(0);
         done();
       });
     });

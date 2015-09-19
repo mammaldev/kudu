@@ -14,6 +14,8 @@ export default class Router {
   // routes by default:
   //
   //   POST /users
+  //   GET /users
+  //   GET /users/:userId
   //
   // This method should be called after any custom route handlers have been set
   // up because the URLs used for matching are highly generic and therefore
@@ -22,10 +24,14 @@ export default class Router {
   createGenericRoutes() {
 
     const base = this.config.baseURL || '';
+    let genericURL = `${ base }/:type`;
+    let specificURL = `${ base }/:type/:id`;
     let kudu = this.kudu;
 
     // Register the route handlers with the Express app.
-    kudu.app.post(`${ base }/:type`, handlePost);
+    kudu.app.post(genericURL, handlePost);
+    kudu.app.get(genericURL, handleGet);
+    kudu.app.get(specificURL, handleGet);
 
     //
     // Utility functions
@@ -64,6 +70,39 @@ export default class Router {
       .catch(( err ) => res.status(500).send({
         errors: [ err.message ],
       }));
+    }
+
+    function handleGet( req, res ) {
+
+      const type = req.params.type;
+      const Model = kudu.modelsByPluralName.get(type);
+
+      // If the resource type is unknown we cannot go any further.
+      if ( Model === undefined ) {
+        return res.status(404).end();
+      }
+
+      // If an identifier is present in the URL we need to retrieve a single
+      // model instance.
+      const id = req.params.id;
+
+      if ( id ) {
+        return kudu.db.get(Model.singular, id)
+        .then(( instance ) => {
+
+          if ( !instance ) {
+            return res.status(404).end();
+          }
+
+          res.status(200).json(Serialize.toJSON(instance));
+        });
+      }
+
+      // If no identifier was present we need to retrieve an array of all
+      // instances. If there are no instances for the given type an empty array
+      // will be sent to the client.
+      return kudu.db.getAll(Model.singular)
+      .then(( arr ) => res.status(200).json(Serialize.toJSON(arr)));
     }
   }
 }
