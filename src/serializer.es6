@@ -3,9 +3,19 @@ export default {
   // Serialize a Kudu model instance to a JSON string.
   //
   // Arguments:
-  //   instance    {Object}    A Kudu model instance.
+  //   instance     {Object|Array}    A Kudu model instance or an array of
+  //                                  model instances.
+  //   stringify    {Boolean}         If set, return a JSON string. Otherwise,
+  //                                  return a serializable subset of the model
+  //                                  instance as an object.
   //
-  toJSON( instance ) {
+  toJSON( instance, stringify = true ) {
+
+    // If we have an array of model instances we need to serialize each one
+    // individually before returning a JSON string of the resulting array.
+    if ( Array.isArray(instance) ) {
+      return JSON.stringify(instance.map(( i ) => this.toJSON(i, false)));
+    }
 
     // Get the schema that applies to this model instance. The schema specifies
     // which properties can and cannot be transmitted to a client.
@@ -30,7 +40,12 @@ export default {
       }
     });
 
-    // Convert the new object to a serialized JSON string.
-    return JSON.stringify(result);
+    // If the "stringify" flag was set we convert the new object into a
+    // serialized JSON string. Otherwise we just return the new object.
+    if ( stringify ) {
+      return JSON.stringify(result);
+    }
+
+    return result;
   },
 };
