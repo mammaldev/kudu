@@ -14,7 +14,12 @@ export default {
     // If we have an array of model instances we need to serialize each one
     // individually before returning a JSON string of the resulting array.
     if ( Array.isArray(instance) ) {
-      return JSON.stringify(instance.map(( i ) => this.toJSON(i, false)));
+
+      let toSerialize = {
+        data: instance.map(( i ) => this.toJSON(i, false)),
+      };
+
+      return JSON.stringify(toSerialize);
     }
 
     // Get the schema that applies to this model instance. The schema specifies
@@ -43,7 +48,12 @@ export default {
     // If the "stringify" flag was set we convert the new object into a
     // serialized JSON string. Otherwise we just return the new object.
     if ( stringify ) {
-      return JSON.stringify(result);
+
+      let toSerialize = {
+        data: result,
+      };
+
+      return JSON.stringify(toSerialize);
     }
 
     return result;

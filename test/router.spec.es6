@@ -57,7 +57,7 @@ describe('Router', () => {
         if ( err ) {
           return done(err);
         }
-        expect(JSON.parse(res.body)).to.have.property('name', 'test');
+        expect(JSON.parse(res.body).data).to.have.property('name', 'test');
         done();
       });
     });
@@ -81,7 +81,7 @@ describe('Router', () => {
           if ( err ) {
             throw err;
           }
-          expect(JSON.parse(res.body)).to.have.property('name', 'test');
+          expect(JSON.parse(res.body).data).to.have.property('name', 'test');
           done();
         });
       })
@@ -96,7 +96,7 @@ describe('Router', () => {
           if ( err ) {
             throw err;
           }
-          expect(JSON.parse(res.body)).to.be.an('array').and.to.have.length(1);
+          expect(JSON.parse(res.body).data).to.be.an('array').and.to.have.length(1);
           done();
         });
       })
@@ -109,7 +109,7 @@ describe('Router', () => {
         if ( err ) {
           throw err;
         }
-        expect(JSON.parse(res.body)).to.be.an('array').and.to.have.length(0);
+        expect(JSON.parse(res.body).data).to.be.an('array').and.to.have.length(0);
         done();
       });
     });
