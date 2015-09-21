@@ -1,0 +1,76 @@
+import chai from 'chai';
+import Kudu from '../src/kudu';
+import deserialize from '../src/deserializer';
+
+let expect = chai.expect;
+
+describe('Deserializer', () => {
+
+  let kudu;
+  let Model;
+
+  beforeEach(() => {
+    kudu = new Kudu();
+    Model = kudu.createModel('test', {
+      properties: {
+        name: {
+          type: String,
+        },
+      },
+    });
+  });
+
+  it('should throw if not passed anything to deserialize', () => {
+    let test = () => deserialize();
+    expect(test).to.throw(Error, /Expected an object/);
+  });
+
+  it('should throw if passed an object without a "data" property', () => {
+    let test = () => deserialize({}, kudu);
+    expect(test).to.throw(Error, /data/);
+  });
+
+  it('should throw if passed an object without a type property', () => {
+    let test = () => deserialize({ data: {} }, kudu);
+    expect(test).to.throw(Error, /"type"/);
+  });
+
+  it('should throw if passed an object without an id property', () => {
+    let test = () => deserialize({ data: { type: 'type' } }, kudu);
+    expect(test).to.throw(Error, /"id"/);
+  });
+
+  it('should not throw if passed an object without an id property when an id is not required', () => {
+    let test = () => deserialize({ data: { type: 'test' } }, kudu, false);
+    expect(test).not.to.throw(Error);
+  });
+
+  it('should throw if the type refers to a non-existent model', () => {
+    let test = () => deserialize({ data: { type: 'fail', id: '1' } }, kudu);
+    expect(test).to.throw(Error, /model/);
+  });
+
+  it('should return a Kudu model instance if passed a JSON string', () => {
+    let obj = JSON.stringify({
+      data: { type: 'test', id: '1' },
+    });
+    let deserialized = deserialize(obj, kudu);
+    expect(deserialized).to.be.an.instanceOf(Model);
+  });
+
+  it('should return a Kudu model instance if passed an object', () => {
+    let obj = {
+      data: { type: 'test', id: '1' },
+    };
+    let deserialized = deserialize(obj, kudu);
+    expect(deserialized).to.be.an.instanceOf(Model);
+  });
+
+  it('should copy "attributes" onto the Kudu model instance', () => {
+    let obj = {
+      data: { type: 'test', id: '1', attributes: { prop: 'test' } },
+    };
+    let deserialized = deserialize(obj, kudu);
+    expect(deserialized).to.have.property('prop', 'test');
+  });
+});
