@@ -52,7 +52,9 @@ describe('Router', () => {
     });
 
     it('should 201 with the serialized instance when the body is valid', ( done ) => {
-      request.post('/tests').send({ name: 'test', type: 'test' }).expect(201)
+      request.post('/tests').send({
+        data: { type: 'test', attributes: { name: 'test' } },
+      }).expect(201)
       .end(( err, res ) => {
         if ( err ) {
           return done(err);

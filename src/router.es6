@@ -1,4 +1,5 @@
 import Serialize from './serializer';
+import deserialize from './deserializer';
 import validate from './validate';
 
 export default class Router {
@@ -40,16 +41,25 @@ export default class Router {
     function handlePost( req, res ) {
 
       const type = req.params.type;
-      const Model = kudu.modelsByPluralName.get(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( Model === undefined ) {
+      if ( kudu.modelsByPluralName.get(type) === undefined ) {
         return res.status(404).end();
       }
 
-      // Create an instance of the model from the data provided in the request
-      // body.
-      const instance = new Model(req.body);
+      // Attempt to deserialize the request body into a Kudu model instance.
+      // Because the resource has been created on the client it is not required
+      // to have an "id" property hence the flag as the final argument.
+      let instance;
+
+      try {
+        instance = deserialize(req.body, kudu, false);
+      } catch ( err ) {
+
+        return res.status(400).send({
+          errors: [ err.message ],
+        });
+      }
 
       // Validate the model instance. If it doesn't conform to the schema an
       // error will be thrown.
