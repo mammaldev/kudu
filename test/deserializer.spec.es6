@@ -26,27 +26,27 @@ describe('Deserializer', () => {
   });
 
   it('should throw if passed an object without a "data" property', () => {
-    let test = () => deserialize({}, kudu);
+    let test = () => deserialize(kudu, {});
     expect(test).to.throw(Error, /data/);
   });
 
   it('should throw if passed an object without a type property', () => {
-    let test = () => deserialize({ data: {} }, kudu);
+    let test = () => deserialize(kudu, { data: {} });
     expect(test).to.throw(Error, /"type"/);
   });
 
   it('should throw if passed an object without an id property', () => {
-    let test = () => deserialize({ data: { type: 'type' } }, kudu);
+    let test = () => deserialize(kudu, { data: { type: 'type' } });
     expect(test).to.throw(Error, /"id"/);
   });
 
   it('should not throw if passed an object without an id property when an id is not required', () => {
-    let test = () => deserialize({ data: { type: 'test' } }, kudu, false);
+    let test = () => deserialize(kudu, { data: { type: 'test' } }, false);
     expect(test).not.to.throw(Error);
   });
 
   it('should throw if the type refers to a non-existent model', () => {
-    let test = () => deserialize({ data: { type: 'fail', id: '1' } }, kudu);
+    let test = () => deserialize(kudu, { data: { type: 'fail', id: '1' } });
     expect(test).to.throw(Error, /model/);
   });
 
@@ -54,7 +54,7 @@ describe('Deserializer', () => {
     let obj = JSON.stringify({
       data: { type: 'test', id: '1' },
     });
-    let deserialized = deserialize(obj, kudu);
+    let deserialized = deserialize(kudu, obj);
     expect(deserialized).to.be.an.instanceOf(Model);
   });
 
@@ -62,7 +62,7 @@ describe('Deserializer', () => {
     let obj = {
       data: { type: 'test', id: '1' },
     };
-    let deserialized = deserialize(obj, kudu);
+    let deserialized = deserialize(kudu, obj);
     expect(deserialized).to.be.an.instanceOf(Model);
   });
 
@@ -70,7 +70,7 @@ describe('Deserializer', () => {
     let obj = {
       data: { type: 'test', id: '1', attributes: { prop: 'test' } },
     };
-    let deserialized = deserialize(obj, kudu);
+    let deserialized = deserialize(kudu, obj);
     expect(deserialized).to.have.property('prop', 'test');
   });
 });

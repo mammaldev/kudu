@@ -1,13 +1,13 @@
 // Deserialize a JSON API compliant request object into a Kudu model instance.
 //
 // Arguments:
+//   app          {Kudu}       A Kudu app instance.
 //   obj          {Object}     A JSON API compliant request object in the form
 //                             of a JSON string or an object.
-//   app          {Kudu}       A Kudu app instance.
 //   requireId    {Boolean}    Flag to indicate whether or not the "id"
 //                             property is required on the deserialized object.
 //
-export default ( obj = null, app = null, requireId = true ) => {
+export default ( app = null, obj = null, requireId = true ) => {
 
   if ( typeof obj === 'string' ) {
     obj = JSON.parse(obj);

@@ -27,6 +27,10 @@ describe('Kudu', () => {
     expect(kudu.db).to.be.an.instanceOf(MemoryAdapter);
   });
 
+  it('should expose a deserialize method', () => {
+    expect(kudu.deserialize).to.be.a('function');
+  });
+
   describe('#createModel', () => {
 
     it('should throw an error if not passed a schema object', () => {

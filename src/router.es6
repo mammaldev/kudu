@@ -1,5 +1,4 @@
 import Serialize from './serializer';
-import deserialize from './deserializer';
 import validate from './validate';
 
 export default class Router {
@@ -53,7 +52,7 @@ export default class Router {
       let instance;
 
       try {
-        instance = deserialize(req.body, kudu, false);
+        instance = kudu.deserialize(req.body, false);
       } catch ( err ) {
 
         return res.status(400).send({
