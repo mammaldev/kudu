@@ -2,6 +2,7 @@ import MemoryAdapter from './adapter';
 import BaseModel from './model';
 import Router from './router';
 import deserialize from './deserializer';
+import serialize from './serializer';
 
 export default class Kudu {
 
@@ -35,9 +36,10 @@ export default class Kudu {
     // provided for it.
     this.router = new Router(this, config.router);
 
-    // Create a deserializer for this app. The default deserializer expects to
-    // receive data in a format that complies with the JSON API spec.
+    // Create a serializer and deserializer for this app. The defaults expect
+    // to handle data in a format that complies with the JSON API spec.
     this.deserialize = deserialize.bind(null, this);
+    this.serialize = serialize;
   }
 
   // Create a new model. The result will be a constructor function that can

@@ -31,6 +31,10 @@ describe('Kudu', () => {
     expect(kudu.deserialize).to.be.a('function');
   });
 
+  it('should expose a serializer', () => {
+    expect(kudu.serialize).to.be.an('object');
+  });
+
   describe('#createModel', () => {
 
     it('should throw an error if not passed a schema object', () => {

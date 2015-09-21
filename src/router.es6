@@ -1,4 +1,3 @@
-import Serialize from './serializer';
 import validate from './validate';
 
 export default class Router {
@@ -75,7 +74,7 @@ export default class Router {
       // caused by an adapter failure, meaning 500 "Internal server error" is
       // likely the most appropriate response.
       return instance.save()
-      .then(( instance ) => res.status(201).json(Serialize.toJSON(instance)))
+      .then(( instance ) => res.status(201).json(kudu.serialize.toJSON(instance)))
       .catch(( err ) => res.status(500).send({
         errors: [ err.message ],
       }));
@@ -103,7 +102,7 @@ export default class Router {
             return res.status(404).end();
           }
 
-          res.status(200).json(Serialize.toJSON(instance));
+          res.status(200).json(kudu.serialize.toJSON(instance));
         });
       }
 
@@ -111,7 +110,7 @@ export default class Router {
       // instances. If there are no instances for the given type an empty array
       // will be sent to the client.
       return kudu.db.getAll(Model.singular)
-      .then(( arr ) => res.status(200).json(Serialize.toJSON(arr)));
+      .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)));
     }
   }
 }
