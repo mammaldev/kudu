@@ -46,6 +46,12 @@ describe('Router', () => {
       request.post('/tests').send().expect(400, done);
     });
 
+    it('should 409 when the request body type doesn\'t match the URL', ( done ) => {
+      request.post('/tests').send({
+        data: { type: 'fail' },
+      }).expect(409, done);
+    });
+
     it('should respond with a serialized object containing errors', ( done ) => {
       request.post('/tests').send().expect(400)
       .end(( err, res ) => {

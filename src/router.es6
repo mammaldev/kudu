@@ -41,9 +41,10 @@ export default class Router {
     function handlePost( req, res ) {
 
       const type = req.params.type;
+      const Model = kudu.modelsByPluralName.get(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( kudu.modelsByPluralName.get(type) === undefined ) {
+      if ( Model === undefined ) {
         return res.status(404).end();
       }
 
@@ -53,9 +54,20 @@ export default class Router {
       let instance;
 
       try {
-        instance = kudu.deserialize(req.body, false);
+        instance = kudu.deserialize(req.body, type, false);
       } catch ( err ) {
 
+        // The deserializer can throw errors with a suggested HTTP response
+        // status. If this error has one we send it to the client.
+        if ( typeof err.status === 'number' ) {
+          return res.status(err.status).send({
+            errors: [ err.message ],
+          });
+        }
+
+        // If the error thrown by the deserializer doesn't have a recommended
+        // status code attached to it we just use the generic 400 "Bad request"
+        // status.
         return res.status(400).send({
           errors: [ err.message ],
         });
@@ -129,7 +141,7 @@ export default class Router {
       let newInstance;
 
       try {
-        newInstance = kudu.deserialize(req.body);
+        newInstance = kudu.deserialize(req.body, type);
       } catch ( err ) {
 
         return res.status(400).send({
