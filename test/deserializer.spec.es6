@@ -41,7 +41,7 @@ describe('Deserializer', () => {
   });
 
   it('should not throw if passed an object without an id property when an id is not required', () => {
-    let test = () => deserialize(kudu, { data: { type: 'test' } }, false);
+    let test = () => deserialize(kudu, { data: { type: 'test' } }, 'test', false);
     expect(test).not.to.throw(Error);
   });
 
@@ -50,11 +50,16 @@ describe('Deserializer', () => {
     expect(test).to.throw(Error, /model/);
   });
 
+  it('should throw if the expected type does not match the provided type', () => {
+    let test = () => deserialize(kudu, { data: { type: 'test', id: '1' } }, 'fail');
+    expect(test).to.throw(Error, /model/);
+  });
+
   it('should return a Kudu model instance if passed a JSON string', () => {
     let obj = JSON.stringify({
       data: { type: 'test', id: '1' },
     });
-    let deserialized = deserialize(kudu, obj);
+    let deserialized = deserialize(kudu, obj, 'test');
     expect(deserialized).to.be.an.instanceOf(Model);
   });
 
@@ -62,7 +67,7 @@ describe('Deserializer', () => {
     let obj = {
       data: { type: 'test', id: '1' },
     };
-    let deserialized = deserialize(kudu, obj);
+    let deserialized = deserialize(kudu, obj, 'test');
     expect(deserialized).to.be.an.instanceOf(Model);
   });
 
@@ -70,7 +75,7 @@ describe('Deserializer', () => {
     let obj = {
       data: { type: 'test', id: '1', attributes: { prop: 'test' } },
     };
-    let deserialized = deserialize(kudu, obj);
+    let deserialized = deserialize(kudu, obj, 'test');
     expect(deserialized).to.have.property('prop', 'test');
   });
 });

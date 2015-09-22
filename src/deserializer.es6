@@ -1,13 +1,17 @@
 // Deserialize a JSON API compliant request object into a Kudu model instance.
+// If the "type" property of the payload does not correspond with the expected
+// Kudu model type an error will be thrown.
 //
 // Arguments:
 //   app          {Kudu}       A Kudu app instance.
 //   obj          {Object}     A JSON API compliant request object in the form
 //                             of a JSON string or an object.
+//   type         {String}     The Kudu model "type" of which "obj" represents
+//                             an instance.
 //   requireId    {Boolean}    Flag to indicate whether or not the "id"
 //                             property is required on the deserialized object.
 //
-export default ( app = null, obj = null, requireId = true ) => {
+export default ( app = null, obj = null, type = null, requireId = true ) => {
 
   if ( typeof obj === 'string' ) {
     obj = JSON.parse(obj);
@@ -44,7 +48,16 @@ export default ( app = null, obj = null, requireId = true ) => {
   let Model = app.models.get(data.type);
 
   if ( !Model ) {
-    throw new Error(`No model for type "${ data.type }".`);
+    let err = new Error(`No model for type "${ data.type }".`);
+    err.status = 409;
+    throw err;
+  }
+
+  // If the model constructor is not for the expected type we have a conflict.
+  if ( type !== Model.plural && type !== Model.singular ) {
+    let err = new Error(`Expected ${ type } model but got ${ Model.singular }.`);
+    err.status = 409;
+    throw err;
   }
 
   return new Model(data.attributes);
