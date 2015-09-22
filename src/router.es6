@@ -15,6 +15,7 @@ export default class Router {
   //   POST /users
   //   GET /users
   //   GET /users/:userId
+  //   PATCH /users/:userId
   //
   // This method should be called after any custom route handlers have been set
   // up because the URLs used for matching are highly generic and therefore
@@ -31,6 +32,7 @@ export default class Router {
     kudu.app.post(genericURL, handlePost);
     kudu.app.get(genericURL, handleGet);
     kudu.app.get(specificURL, handleGet);
+    kudu.app.patch(specificURL, handlePatch);
 
     //
     // Utility functions
@@ -111,6 +113,54 @@ export default class Router {
       // will be sent to the client.
       return kudu.db.getAll(Model.singular)
       .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)));
+    }
+
+    function handlePatch( req, res ) {
+
+      const type = req.params.type;
+      const Model = kudu.modelsByPluralName.get(type);
+
+      // If the resource type is unknown we cannot go any further.
+      if ( Model === undefined ) {
+        return res.status(404).end();
+      }
+
+      // Attempt to deserialize the request body into a Kudu model instance.
+      let newInstance;
+
+      try {
+        newInstance = kudu.deserialize(req.body);
+      } catch ( err ) {
+
+        return res.status(400).send({
+          errors: [ err.message ],
+        });
+      }
+
+      // Attempt to retrieve the stored data corresponding to the model.
+      return kudu.db.get(Model.singular, req.params.id)
+      .then(( instance ) => {
+
+        // If the instance we are attempting to update doesn't exist we can't
+        // go any further.
+        if ( !instance ) {
+          return res.status(404).end();
+        }
+
+        // Merge the stored instance with the new instance. The JSON API spec
+        // states that properties sent with a PATCH request should be used to
+        // update the corresponding stored property and stored properties that
+        // are not present in the request should retain the current values.
+        Object.keys(newInstance).forEach(( key ) => {
+          instance[ key ] = newInstance[ key ];
+        });
+
+        return instance.save();
+      })
+      .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated)))
+      .catch(( err ) => res.status(500).send({
+        errors: [ err.message ],
+      }));
     }
   }
 }

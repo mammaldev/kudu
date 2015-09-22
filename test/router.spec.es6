@@ -27,6 +27,9 @@ describe('Router', () => {
           type: String,
           required: true,
         },
+        another: {
+          type: String,
+        },
       },
     });
     app.createGenericRoutes();
@@ -114,6 +117,53 @@ describe('Router', () => {
         expect(JSON.parse(res.body).data).to.be.an('array').and.to.have.length(0);
         done();
       });
+    });
+  });
+
+  describe('generic PATCH handler', () => {
+
+    it('should 404 when the URL does not correspond to a model', ( done ) => {
+      request.patch('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the identifier does not correspond to a model', ( done ) => {
+      request.patch('/tests/1').send({
+        data: { type: 'test', id: '1' },
+      }).expect(404, done);
+    });
+
+    it('should 200 with an updated model instance', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.patch('/tests/1').send({
+          data: { type: 'test', id: '1', attributes: { name: 'new' } },
+        }).expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(JSON.parse(res.body).data).to.have.property('name', 'new');
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
+    });
+
+    it('should not modify attributes not present in the request', ( done ) => {
+      new Model({ id: '1', name: 'test', another: 'test' }).save()
+      .then(() => {
+        request.patch('/tests/1').send({
+          data: { type: 'test', id: '1', attributes: { name: 'new' } },
+        }).expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(JSON.parse(res.body).data).to.have.property('another', 'test');
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
     });
   });
 });
