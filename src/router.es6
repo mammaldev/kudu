@@ -144,6 +144,17 @@ export default class Router {
         newInstance = kudu.deserialize(req.body, type);
       } catch ( err ) {
 
+        // The deserializer can throw errors with a suggested HTTP response
+        // status. If this error has one we send it to the client.
+        if ( typeof err.status === 'number' ) {
+          return res.status(err.status).send({
+            errors: [ err.message ],
+          });
+        }
+
+        // If the error thrown by the deserializer doesn't have a recommended
+        // status code attached to it we just use the generic 400 "Bad request"
+        // status.
         return res.status(400).send({
           errors: [ err.message ],
         });

@@ -138,6 +138,12 @@ describe('Router', () => {
       }).expect(404, done);
     });
 
+    it('should 409 when the request body type doesn\'t match the URL', ( done ) => {
+      request.patch('/tests/1').send({
+        data: { type: 'fail', id: '1' },
+      }).expect(409, done);
+    });
+
     it('should 200 with an updated model instance', ( done ) => {
       new Model({ id: '1', name: 'test' }).save()
       .then(() => {
