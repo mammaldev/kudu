@@ -58,4 +58,38 @@ export default {
 
     return result;
   },
+
+  // Serialize an Error-like object or an array of Error-like objects to a JSON
+  // string compliant with the JSON API specification.
+  //
+  // Arguments:
+  //   errors       {Object|Array}    An Error-like object or an array of Error
+  //                                  -like objects.
+  //   stringify    {Boolean}         If set, return a JSON string. Otherwise,
+  //                                  return a serializable subset of the
+  //                                  errors as an object.
+  //
+  // An Error-like object is an instance of the built-in Error constructor or
+  // an object that a "message" property.
+  errorsToJSON( errors, stringify = true ) {
+
+    // The JSON API specification states that errors must be located in an
+    // "errors" property of the top level document. The value of that property
+    // must be an array of error objects.
+    if ( !Array.isArray(errors) ) {
+      errors = [ errors ];
+    }
+
+    // Map the array of Error-like objects to error objects that are compliant
+    // with the JSON API spec.
+    errors = errors.map(( error ) => ({
+      detail: error.message,
+      status: error.status,
+    }));
+
+    // Convert the new array into serialized JSON string.
+    return JSON.stringify({
+      errors,
+    });
+  },
 };

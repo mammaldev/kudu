@@ -55,7 +55,7 @@ describe('Router', () => {
     it('should respond with a serialized object containing errors', ( done ) => {
       request.post('/tests').send().expect(400)
       .end(( err, res ) => {
-        expect(res.body).to.have.property('errors').which.is.an('array');
+        expect(JSON.parse(res.body)).to.have.property('errors').which.is.an('array');
         done();
       });
     });

@@ -55,4 +55,24 @@ describe('Serializer', () => {
       expect(JSON.parse(serialized).data).to.be.an('array');
     });
   });
+
+  describe('#errorsToJSON', () => {
+
+    it('should return a JSON string', () => {
+      let error = new Error('test');
+      let serialized = Serialize.errorsToJSON(error);
+      expect(JSON.parse(serialized)).to.deep.equal({
+        errors: [ { detail: 'test' } ],
+      });
+    });
+
+    it('should serialize an array of errors', () => {
+      let errors = [
+        new Error('test1'),
+        new Error('test2'),
+      ];
+      let serialized = Serialize.errorsToJSON(errors);
+      expect(JSON.parse(serialized).errors).to.be.an('array');
+    });
+  });
 });

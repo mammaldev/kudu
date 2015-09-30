@@ -57,20 +57,18 @@ export default class Router {
         instance = kudu.deserialize(req.body, type, false);
       } catch ( err ) {
 
+        let errors = kudu.serialize.errorsToJSON(err);
+
         // The deserializer can throw errors with a suggested HTTP response
         // status. If this error has one we send it to the client.
         if ( typeof err.status === 'number' ) {
-          return res.status(err.status).send({
-            errors: [ err.message ],
-          });
+          return res.status(err.status).json(errors);
         }
 
         // If the error thrown by the deserializer doesn't have a recommended
         // status code attached to it we just use the generic 400 "Bad request"
         // status.
-        return res.status(400).send({
-          errors: [ err.message ],
-        });
+        return res.status(400).json(errors);
       }
 
       // Validate the model instance. If it doesn't conform to the schema an
@@ -78,9 +76,7 @@ export default class Router {
       try {
         validate(instance);
       } catch ( err ) {
-        return res.status(400).send({
-          errors: [ err.message ],
-        });
+        return res.status(400).json(kudu.serialize.errorsToJSON(err));
       }
 
       // Attempt to persist the newly created instance. By this point we can be
@@ -89,9 +85,7 @@ export default class Router {
       // likely the most appropriate response.
       return instance.save()
       .then(( instance ) => res.status(201).json(kudu.serialize.toJSON(instance)))
-      .catch(( err ) => res.status(500).send({
-        errors: [ err.message ],
-      }));
+      .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
 
     function handleGet( req, res ) {
@@ -144,20 +138,18 @@ export default class Router {
         newInstance = kudu.deserialize(req.body, type);
       } catch ( err ) {
 
+        let errors = kudu.serialize.errorsToJSON(err);
+
         // The deserializer can throw errors with a suggested HTTP response
         // status. If this error has one we send it to the client.
         if ( typeof err.status === 'number' ) {
-          return res.status(err.status).send({
-            errors: [ err.message ],
-          });
+          return res.status(err.status).json(errors);
         }
 
         // If the error thrown by the deserializer doesn't have a recommended
         // status code attached to it we just use the generic 400 "Bad request"
         // status.
-        return res.status(400).send({
-          errors: [ err.message ],
-        });
+        return res.status(400).json(errors);
       }
 
       // Attempt to retrieve the stored data corresponding to the model.
@@ -181,9 +173,7 @@ export default class Router {
         return instance.save();
       })
       .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated)))
-      .catch(( err ) => res.status(500).send({
-        errors: [ err.message ],
-      }));
+      .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
   }
 }
