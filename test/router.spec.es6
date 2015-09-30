@@ -178,4 +178,23 @@ describe('Router', () => {
       .catch(( err ) => done(err));
     });
   });
+
+  describe('generic DELETE handler', () => {
+
+    it('should 404 when the URL does not correspond to a model', ( done ) => {
+      request.delete('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the identifier does not correspond to a model', ( done ) => {
+      request.delete('/tests/1').send().expect(404, done);
+    });
+
+    it('should 204 on success', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.delete('/tests/1').send().expect(204, done);
+      })
+      .catch(( err ) => done(err));
+    });
+  });
 });

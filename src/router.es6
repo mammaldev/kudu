@@ -16,6 +16,7 @@ export default class Router {
   //   GET /users
   //   GET /users/:userId
   //   PATCH /users/:userId
+  //   DELETE /users/:userId
   //
   // This method should be called after any custom route handlers have been set
   // up because the URLs used for matching are highly generic and therefore
@@ -33,6 +34,7 @@ export default class Router {
     kudu.app.get(genericURL, handleGet);
     kudu.app.get(specificURL, handleGet);
     kudu.app.patch(specificURL, handlePatch);
+    kudu.app.delete(specificURL, handleDelete);
 
     //
     // Utility functions
@@ -173,6 +175,33 @@ export default class Router {
         return instance.update();
       })
       .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated)))
+      .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
+    }
+
+    function handleDelete( req, res ) {
+
+      const type = req.params.type;
+      const Model = kudu.modelsByPluralName.get(type);
+
+      // If the resource type is unknown we cannot go any further.
+      if ( Model === undefined ) {
+        return res.status(404).end();
+      }
+
+      // Attempt to retrieve the stored data corresponding to the model.
+      return kudu.db.get(Model.singular, req.params.id)
+      .then(( instance ) => {
+
+        // If the instance we are attempting to delete doesn't exist we can't
+        // go any further.
+        if ( !instance ) {
+          return res.status(404).end();
+        }
+
+        // Delete the instance.
+        return instance.delete();
+      })
+      .then(() => res.status(204).end())
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
   }

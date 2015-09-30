@@ -107,4 +107,28 @@ describe('MemoryAdapter', () => {
       return expect(adapter.update(instance)).to.eventually.deep.equal(instance);
     });
   });
+
+  describe('#delete', () => {
+
+    beforeEach(() => {
+      adapter.create({ type: 'test', id: 1 });
+    });
+
+    it('should throw an error when not passed an object', () => {
+      return expect(adapter.delete()).to.be.rejectedWith(Error, /model instance/);
+    });
+
+    it('should throw an error when passed an object without a type', () => {
+      return expect(adapter.delete({})).to.be.rejectedWith(Error, /"type"/);
+    });
+
+    it('should throw an error when passed an object without an id', () => {
+      return expect(adapter.delete({ type: 'test' })).to.be.rejectedWith(Error, /"id"/);
+    });
+
+    it('should delete a stored instance', () => {
+      adapter.delete({ type: 'test', id: 1 });
+      return expect(adapter.get('test', 1)).to.eventually.become(undefined);
+    });
+  });
 });

@@ -71,4 +71,15 @@ export default class BaseModel {
       return this;
     });
   }
+
+  // Delete the model instance via the adapater configured for use with the
+  // Kudu app.
+  delete() {
+
+    return this.app.db.delete(this)
+    .then(( result ) => {
+
+      return this;
+    });
+  }
 }

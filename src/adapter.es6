@@ -149,4 +149,41 @@ export default class MemoryAdapter {
     modelStore.set(instance.id, instance);
     return Promise.resolve(instance);
   }
+
+  // Delete a Kudu model instance from the in-memory store.
+  //
+  // Arguments:
+  //   instance    {Object}    The model instance to delete.
+  //
+  delete( instance ) {
+
+    // If we don't have an instance then there's nothing to delete.
+    if ( typeof instance !== 'object' ) {
+      return Promise.reject(new Error('Expected a model instance to delete.'));
+    }
+
+    // If the instance does not have a "type" property we don't know where to
+    // delete it from.
+    if ( instance.type === undefined ) {
+      return Promise.reject(new Error('Expected a "type" property.'));
+    }
+
+    // If the instance does not have an "id" property we don't know which
+    // stored instance to delete.
+    if ( instance.id === undefined ) {
+      return Promise.reject(new Error('Expected an "id" property.'));
+    }
+
+    // If a store for the requested model type doesn't exist then the specific
+    // instance can't exist either.
+    let modelStore = this.store.get(instance.type);
+
+    if ( !(modelStore instanceof Map) ) {
+      return Promise.reject(new Error('Missing store.'));
+    }
+
+    // Delete the model instance from the relevant type store.
+    modelStore.delete(instance.id);
+    return Promise.resolve();
+  }
 }

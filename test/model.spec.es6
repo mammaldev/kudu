@@ -142,4 +142,30 @@ describe('Model', () => {
       return expect(instance.update()).to.eventually.become(instance);
     });
   });
+
+  describe('#delete', () => {
+
+    let Model;
+
+    beforeEach(() => {
+      Model = kudu.createModel('test', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+      });
+    });
+
+    it('should return a promise', () => {
+      let instance = new Model({ type: 'test', name: 'test' });
+      expect(instance.delete()).to.be.an.instanceOf(Promise);
+    });
+
+    it('should return the deleted instance', () => {
+      let instance = new Model({ type: 'test', name: 'test' });
+      expect(instance.delete()).to.be.eventually.become(instance);
+    });
+  });
 });
