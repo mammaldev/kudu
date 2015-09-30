@@ -45,4 +45,30 @@ export default class BaseModel {
       return this;
     });
   }
+
+  // Update the model instance via the adapter configured for use with the Kudu
+  // app.
+  update() {
+
+    // Attempt to validate the instance. We don't want to save invalid models.
+    try {
+      validate(this);
+    } catch ( err ) {
+      return Promise.reject(err);
+    }
+
+    // If we reached this point the the model is valid. We pass it off to the
+    // adapter to persist. The adapter method must return a promise that will
+    // resolve to an object representing this model instance.
+    return this.app.db.update(this)
+    .then(( result ) => {
+
+      // Merge the object returned from the adapter with this model instance to
+      // bring in any new or updated properties added by the adapter (such as
+      // an "updated at" property).
+      Object.keys(result).forEach(( key ) => this[ key ] = result[ key ]);
+
+      return this;
+    });
+  }
 }

@@ -75,4 +75,36 @@ describe('MemoryAdapter', () => {
       ]);
     });
   });
+
+  describe('#update', () => {
+
+    beforeEach(() => {
+      adapter.create({ type: 'test', id: 1 });
+    });
+
+    it('should throw an error when not passed an object', () => {
+      return expect(adapter.update()).to.be.rejectedWith(Error, /model instance/);
+    });
+
+    it('should throw an error when passed an object without a type', () => {
+      return expect(adapter.update({})).to.be.rejectedWith(Error, /"type"/);
+    });
+
+    it('should throw an error when passed an object without an id', () => {
+      return expect(adapter.update({ type: 'test' })).to.be.rejectedWith(Error, /"id"/);
+    });
+
+    it('should throw an error when a type store does not exist', () => {
+      return expect(adapter.update({ type: 'fail', id: 1 })).to.be.rejectedWith(Error, /store/);
+    });
+
+    it('should throw an error when an instance is not stored', () => {
+      return expect(adapter.update({ type: 'test', id: 2 })).to.be.rejectedWith(Error, /instance/);
+    });
+
+    it('should return an updated instance', () => {
+      let instance = { type: 'test', id: 1, name: 'new' };
+      return expect(adapter.update(instance)).to.eventually.deep.equal(instance);
+    });
+  });
 });

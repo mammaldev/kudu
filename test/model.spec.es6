@@ -107,4 +107,39 @@ describe('Model', () => {
       return expect(instance.save()).to.eventually.have.property('id');
     });
   });
+
+  describe('#update', () => {
+
+    let Model;
+    let instance;
+
+    beforeEach(() => {
+      Model = kudu.createModel('test', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+      });
+      instance = new Model({
+        type: 'test',
+        name: 'test',
+      });
+      return instance.save();
+    });
+
+    it('should return a promise', () => {
+      expect(instance.update()).to.be.an.instanceOf(Promise);
+    });
+
+    it('should fail when the model is invalid', () => {
+      let instance = new Model();
+      return expect(instance.update()).to.be.rejectedWith(Error, /required/);
+    });
+
+    it('should return the updated instance', () => {
+      return expect(instance.update()).to.eventually.become(instance);
+    });
+  });
 });

@@ -170,7 +170,7 @@ export default class Router {
           instance[ key ] = newInstance[ key ];
         });
 
-        return instance.save();
+        return instance.update();
       })
       .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated)))
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
