@@ -106,6 +106,67 @@ export default class MemoryAdapter {
     return Promise.resolve(Array.from(modelStore).map(( i ) => i[ 1 ]));
   }
 
+  // Get a list of Kudu model instances by type and relation.
+  //
+  // Arguments:
+  //   ancestorType    {String}    The type of the parent model.
+  //   ancestorId      {String}    The unique identifier of a model.
+  //   relationship    {Object}    A Kudu relationship object representing the
+  //                               relationship between the ancestor model and
+  //                               another.
+  //
+  // The relationship object will have the following properties:
+  //   type       {String}     The singular name of a Kudu model.
+  //   isArray    {Boolean}    Flag indicating whether the relationship is to-
+  //                           many.
+  //
+  getRelated( ancestorType, ancestorId, relationship ) {
+
+    // All of the arguments are required. If we don't have any of them we can't
+    // go any further. An identifier is required because it is not possible to
+    // get a generic relation between two types.
+    if (
+      typeof ancestorType !== 'string' ||
+      typeof ancestorId !== 'string' ||
+      typeof relationship !== 'object'
+    ) {
+      let err = new Error('Expected a type, identifier and relationship.');
+      return Promise.reject(err);
+    }
+
+    // Validate the relationship object. If the "type" property is missing we
+    // don't know where to find the related instances and can't continue.
+    if ( !relationship.hasOwnProperty('type') ) {
+      let err = new Error('Missing "type" property on a relationship object.');
+      return Promise.reject(err);
+    }
+
+    let relatedType = relationship.type;
+    let relatedStore = this.store.get(relatedType);
+
+    // If a store for the requested model type doesn't exist we return an empty
+    // array or nothing, depending on whether the relationship was specified as
+    // to-many or to-one.
+    if ( !( relatedStore instanceof Map ) ) {
+      return Promise.resolve(relationship.hasMany ? [] : null);
+    }
+
+    // If the relationship is to-many build an array containing all instances
+    // of the model that are related to the ancestor instance. For example the
+    // following data set would result in an array with one element:
+    //
+    //   { type: 'ancestor', id: '1' }
+    //   { type: 'descendant', id: '2', parent: '1' }
+    //
+    // If the relationship is to-one we return the first matching instance.
+    let all = Array.from(relatedStore).map(( i ) => i[ 1 ]);
+    let relations = all.filter(( i ) => {
+      return i[ relationship.key ] === ancestorId;
+    });
+
+    return Promise.resolve(relationship.hasMany ? relations : relations[ 0 ]);
+  }
+
   // Update a Kudu model instance in the in-memory store.
   //
   // Arguments:

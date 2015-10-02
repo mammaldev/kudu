@@ -10,58 +10,37 @@ export default {
   //                                  return a serializable subset of the model
   //                                  instance as an object.
   //
-  toJSON( instance, stringify = true ) {
+  toJSON( instance = null, stringify = true ) {
+
+    // If we don't have an instance to serialize we just return null.
+    if ( !instance ) {
+      return JSON.stringify(null);
+    }
 
     // If we have an array of model instances we need to serialize each one
     // individually before returning a JSON string of the resulting array.
     if ( Array.isArray(instance) ) {
 
       let toSerialize = {
-        data: instance.map(( i ) => ({
-          attributes: this.toJSON(i, false),
-        })),
+        data: instance.map(( instance ) => this.toJSON(instance, false)),
       };
 
       return JSON.stringify(toSerialize);
     }
 
-    // Get the schema that applies to this model instance. The schema specifies
-    // which properties can and cannot be transmitted to a client.
-    let schema = instance.constructor.schema.properties;
-
-    // Build up a new object containing only those properties that can be sent
-    // to a client as "attributes".
-    let result = {};
-
-    Object.keys(instance).forEach(( key ) => {
-
-      let keySchema = schema[ key ];
-
-      // If a property is present in the model schema, and the property is
-      // "public" then it will be included in the serialization. All properties
-      // are public by default.
-      if (
-        keySchema &&
-        ( keySchema.public === true || keySchema.public === undefined )
-      ) {
-        result[ key ] = instance[ key ];
-      }
-    });
+    // If we have a single instance we need to serialize it to a JSON API
+    // resource object.
+    let resource = buildResource(instance);
 
     // If the "stringify" flag was set we convert the new object into a
     // serialized JSON string. Otherwise we just return the new object.
     if ( stringify ) {
-
-      let toSerialize = {
-        data: {
-          attributes: result,
-        },
-      };
-
-      return JSON.stringify(toSerialize);
+      return JSON.stringify({
+        data: resource,
+      });
     }
 
-    return result;
+    return resource;
   },
 
   // Serialize an Error-like object or an array of Error-like objects to a JSON
@@ -98,3 +77,70 @@ export default {
     });
   },
 };
+
+//
+// Utility functions
+//
+
+// Build a JSON API resource object for a Kudu model instance as per
+// http://jsonapi.org/format/#document-resource-objects
+function buildResource( instance ) {
+  return {
+    attributes: buildAttributes(instance),
+    relationships: buildRelationships(instance),
+  };
+}
+
+// Build a JSON API attributes object for a Kudu model instance as per
+// http://jsonapi.org/format/#document-resource-object-attributes
+function buildAttributes( instance ) {
+
+  // Get the schema that applies to this model instance. The schema specifies
+  // which properties can and cannot be transmitted to a client.
+  let schema = instance.constructor.schema.properties;
+
+  // Build up a new object containing only those properties that can be sent to
+  // a client as "attributes".
+  let attributes = {};
+
+  Object.keys(instance).forEach(( key ) => {
+
+    let keySchema = schema[ key ];
+
+    // If a property is present in the model schema, and the property is
+    // "public" then it will be included in the serialization. All properties
+    // are public by default.
+    if (
+      keySchema &&
+      ( keySchema.public === true || keySchema.public === undefined )
+    ) {
+      attributes[ key ] = instance[ key ];
+    }
+  });
+
+  return attributes;
+}
+
+// Build a JSON API relationship object for a Kudu model instance as per
+// http://jsonapi.org/format/#document-resource-object-relationships
+function buildRelationships( instance ) {
+
+  // Get any relationships that apply to this model instance.
+  let relationshipSchema = instance.constructor.schema.relationships || {};
+  let plural = instance.constructor.plural;
+
+  // Build up an object representing the relationships between this instance
+  // and others.
+  let relationships = {};
+
+  Object.keys(relationshipSchema).forEach(( key ) => {
+    relationships[ key ] = {
+      links: {
+        self: `/${ plural }/${ instance.id }/relationships/${ key }`,
+        related: `/${ plural }/${ instance.id }/${ key }`,
+      },
+    };
+  });
+
+  return relationships;
+}

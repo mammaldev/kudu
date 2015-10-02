@@ -8,6 +8,7 @@ describe('Serializer', () => {
 
   let kudu;
   let Model;
+  let Child;
 
   beforeEach(() => {
     kudu = new Kudu();
@@ -21,17 +22,25 @@ describe('Serializer', () => {
           public: false,
         },
       },
+      relationships: {
+        children: { type: 'child', hasMany: true },
+      },
+    });
+    Child = kudu.createModel('child', {
+      properties: {
+        name: {
+          type: String,
+        },
+      },
     });
   });
 
   describe('#toJSON', () => {
 
     it('should return a JSON string', () => {
-      let instance = new Model({ name: 'test' });
+      let instance = new Model({ name: 'test', id: '1' });
       let serialized = Serialize.toJSON(instance);
-      expect(JSON.parse(serialized)).to.deep.equal({
-        data: { attributes: { name: 'test' } },
-      });
+      expect(JSON.parse(serialized)).to.be.an('object');
     });
 
     it('should exclude non-schema properties from the result', () => {
@@ -52,10 +61,36 @@ describe('Serializer', () => {
         new Model({ name: '2' }),
       ];
       let serialized = Serialize.toJSON(instances);
-      expect(JSON.parse(serialized).data).to.deep.equal([
-        { attributes: { name: '1' } },
-        { attributes: { name: '2' } },
-      ]);
+      expect(JSON.parse(serialized).data).to.be.an('array');
+    });
+
+    it('should include relationships', () => {
+      let instance = new Model({ name: 'test', id: '1' });
+      let serialized = Serialize.toJSON(instance);
+      expect(JSON.parse(serialized).data.relationships).to.deep.equal({
+        children: {
+          links: {
+            self: '/tests/1/relationships/children',
+            related: '/tests/1/children',
+          },
+        },
+      });
+    });
+
+    it('should include relationships in each element of an array', () => {
+      let instances = [
+        new Model({ name: '1', id: '1' }),
+        new Model({ name: '2', id: '2' }),
+      ];
+      let serialized = Serialize.toJSON(instances);
+      expect(JSON.parse(serialized).data[ 0 ].relationships).to.deep.equal({
+        children: {
+          links: {
+            self: '/tests/1/relationships/children',
+            related: '/tests/1/children',
+          },
+        },
+      });
     });
   });
 

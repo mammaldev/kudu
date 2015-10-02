@@ -18,6 +18,12 @@ export default class Router {
   //   PATCH /users/:userId
   //   DELETE /users/:userId
   //
+  // If the same application also had a "List" model which has, for example, a
+  // many-to-many relationship to the "User" model the following routes will
+  // also be available:
+  //
+  //   GET /users/:userId/lists
+  //
   // This method should be called after any custom route handlers have been set
   // up because the URLs used for matching are highly generic and therefore
   // likely to conflict with other, more specific routes.
@@ -27,6 +33,7 @@ export default class Router {
     const base = this.config.baseURL || '';
     let genericURL = `${ base }/:type`;
     let specificURL = `${ base }/:type/:id`;
+    let descendantURL = `${ specificURL }/:descendantType`;
     let kudu = this.kudu;
 
     // Register the route handlers with the Express app.
@@ -35,6 +42,7 @@ export default class Router {
     kudu.app.get(specificURL, handleGet);
     kudu.app.patch(specificURL, handlePatch);
     kudu.app.delete(specificURL, handleDelete);
+    kudu.app.get(descendantURL, handleDescendantGet);
 
     //
     // Utility functions
@@ -202,6 +210,42 @@ export default class Router {
         return instance.delete();
       })
       .then(() => res.status(204).end())
+      .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
+    }
+
+    function handleDescendantGet( req, res ) {
+
+      const descendantType = req.params.descendantType;
+      const ancestorType = req.params.type;
+      const ancestorId = req.params.id;
+
+      // If the ancestor resource type is unknown we cannot go any further.
+      const Ancestor = kudu.modelsByPluralName.get(ancestorType);
+
+      if ( Ancestor === undefined ) {
+        return res.status(404).end();
+      }
+
+      // If the ancestor model schema does not specify a relationship to the
+      // descendant we cannot go any further.
+      const relationship = Ancestor.schema.relationships[ descendantType ];
+
+      if ( typeof relationship !== 'object' ) {
+        return res.status(404).end();
+      }
+
+      // If the descendant resource type is unknown we cannot go any further.
+      const Descendant = kudu.models.get(relationship.type);
+
+      if ( Descendant === undefined ) {
+        return res.status(404).end();
+      }
+
+      // Attempt to retrieve the stored data.
+      relationship.key = relationship.key || descendantType;
+
+      return kudu.db.getRelated(ancestorType, ancestorId, relationship)
+      .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)))
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
   }

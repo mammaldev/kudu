@@ -13,6 +13,7 @@ let expect = chai.expect;
 let expressApp;
 let request;
 let Model;
+let Child;
 let app;
 
 describe('Router', () => {
@@ -29,6 +30,18 @@ describe('Router', () => {
         },
         another: {
           type: String,
+        },
+      },
+      relationships: {
+        children: { type: 'child', key: 'parent', hasMany: true },
+        unmodelled: { type: 'unmodelled', hasMany: true },
+      },
+    });
+    Child = app.createModel('child', {
+      properties: {
+        name: {
+          type: String,
+          required: true,
         },
       },
     });
@@ -122,6 +135,40 @@ describe('Router', () => {
         }
         expect(JSON.parse(res.body).data).to.be.an('array').and.to.have.length(0);
         done();
+      });
+    });
+  });
+
+  describe('generic descendant GET handler', () => {
+
+    it('should 404 when the ancestor does not correspond to a model', ( done ) => {
+      request.get('/fails/1/children').send().expect(404, done);
+    });
+
+    it('should 404 when the descendant is not related to the ancestor', ( done ) => {
+      request.get('/tests/1/fails').send().expect(404, done);
+    });
+
+    it('should 404 when the descendant does not correspond to a model', ( done ) => {
+      request.get('/tests/1/unmodelled').send().expect(404, done);
+    });
+
+    it('should 200 with the response', ( done ) => {
+      Promise.all([
+        new Model({ id: '1', name: 'test' }).save(),
+        new Child({ id: '2', name: 'child', parent: '1' }).save(),
+        new Child({ id: '3', name: 'child', parent: '1' }).save(),
+      ])
+      .then(() => {
+
+        request.get('/tests/1/children').send().expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(JSON.parse(res.body).data).to.be.an('array');
+          done();
+        });
       });
     });
   });

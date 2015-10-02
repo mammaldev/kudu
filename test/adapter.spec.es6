@@ -76,6 +76,67 @@ describe('MemoryAdapter', () => {
     });
   });
 
+  describe('#getRelated', () => {
+
+    it('should throw an error when not passed an ancestor type', () => {
+      return expect(adapter.getRelated()).to.be.rejectedWith(Error, /type/);
+    });
+
+    it('should throw an error when not passed an ancestor identifier', () => {
+      return expect(adapter.getRelated('test')).to.be.rejectedWith(Error, /identifier/);
+    });
+
+    it('should throw an error when not passed a relationship object', () => {
+      return expect(adapter.getRelated('test', '1')).to.be.rejectedWith(Error, /relationship/);
+    });
+
+    it('should throw an error if the relationship object is missing a type', () => {
+      return expect(adapter.getRelated('test', '1', {})).to.be.rejectedWith(Error, /Missing "type"/);
+    });
+
+    it('should return an instance when the relationship is to-one', () => {
+      adapter.create({ type: 'parent', id: '1' });
+      adapter.create({ type: 'parent', id: '2' });
+      adapter.create({ type: 'child', id: '3', parent: '1' });
+      adapter.create({ type: 'child', id: '4', parent: '2' });
+      return expect(adapter.getRelated('parent', '1', {
+        type: 'child',
+        key: 'parent',
+      })).to.eventually.become({ type: 'child', id: '3', parent: '1' });
+    });
+
+    it('should return nothing when the relationship is to-one and the relation doesn\'t exist', () => {
+      adapter.create({ type: 'parent', id: '1' });
+      adapter.create({ type: 'child', id: '1', parent: '2' });
+      return expect(adapter.getRelated('parent', '1', {
+        type: 'child',
+        key: 'parent',
+      })).to.eventually.become(undefined);
+    });
+
+    it('should return an array when the relationship is to-many', () => {
+      adapter.create({ type: 'parent', id: '1' });
+      adapter.create({ type: 'parent', id: '2' });
+      adapter.create({ type: 'child', id: '3', parent: '1' });
+      adapter.create({ type: 'child', id: '4', parent: '2' });
+      return expect(adapter.getRelated('parent', '1', {
+        type: 'child',
+        key: 'parent',
+        hasMany: true,
+      })).to.eventually.become([ { type: 'child', id: '3', parent: '1' } ]);
+    });
+
+    it('should return an empty array when the relationship is to-many and no relations exist', () => {
+      adapter.create({ type: 'parent', id: '1' });
+      adapter.create({ type: 'child', id: '3', parent: '2' });
+      return expect(adapter.getRelated('parent', '1', {
+        type: 'child',
+        key: 'parent',
+        hasMany: true,
+      })).to.eventually.become([]);
+    });
+  });
+
   describe('#update', () => {
 
     beforeEach(() => {
