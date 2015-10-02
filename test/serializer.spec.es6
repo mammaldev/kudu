@@ -30,20 +30,20 @@ describe('Serializer', () => {
       let instance = new Model({ name: 'test' });
       let serialized = Serialize.toJSON(instance);
       expect(JSON.parse(serialized)).to.deep.equal({
-        data: { name: 'test' },
+        data: { attributes: { name: 'test' } },
       });
     });
 
     it('should exclude non-schema properties from the result', () => {
       let instance = new Model({ name: 'test', excluded: true });
       let serialized = Serialize.toJSON(instance);
-      expect(JSON.parse(serialized).data).to.not.have.property('excluded');
+      expect(JSON.parse(serialized).data.attributes).to.not.have.property('excluded');
     });
 
     it('should exclude private properties from the result', () => {
       let instance = new Model({ name: 'test', private: true });
       let serialized = Serialize.toJSON(instance);
-      expect(JSON.parse(serialized).data).to.not.have.property('private');
+      expect(JSON.parse(serialized).data.attributes).to.not.have.property('private');
     });
 
     it('should serialize an array of instances', () => {
@@ -52,7 +52,10 @@ describe('Serializer', () => {
         new Model({ name: '2' }),
       ];
       let serialized = Serialize.toJSON(instances);
-      expect(JSON.parse(serialized).data).to.be.an('array');
+      expect(JSON.parse(serialized).data).to.deep.equal([
+        { attributes: { name: '1' } },
+        { attributes: { name: '2' } },
+      ]);
     });
   });
 

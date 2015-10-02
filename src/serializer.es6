@@ -1,6 +1,7 @@
 export default {
 
-  // Serialize a Kudu model instance to a JSON string.
+  // Serialize a Kudu model instance to a JSON string compliant with the JSON
+  // API specification.
   //
   // Arguments:
   //   instance     {Object|Array}    A Kudu model instance or an array of
@@ -16,7 +17,9 @@ export default {
     if ( Array.isArray(instance) ) {
 
       let toSerialize = {
-        data: instance.map(( i ) => this.toJSON(i, false)),
+        data: instance.map(( i ) => ({
+          attributes: this.toJSON(i, false),
+        })),
       };
 
       return JSON.stringify(toSerialize);
@@ -27,7 +30,7 @@ export default {
     let schema = instance.constructor.schema.properties;
 
     // Build up a new object containing only those properties that can be sent
-    // to a client.
+    // to a client as "attributes".
     let result = {};
 
     Object.keys(instance).forEach(( key ) => {
@@ -50,7 +53,9 @@ export default {
     if ( stringify ) {
 
       let toSerialize = {
-        data: result,
+        data: {
+          attributes: result,
+        },
       };
 
       return JSON.stringify(toSerialize);
