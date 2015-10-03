@@ -85,7 +85,17 @@ export default {
 // Build a JSON API resource object for a Kudu model instance as per
 // http://jsonapi.org/format/#document-resource-objects
 function buildResource( instance ) {
+
+  // A JSON API resource object must contain top-level "id" and "type"
+  // properties. We can infer the type from the name registered when the model
+  // constructor was created but "id" must be present on the instance itself.
+  if ( !instance.hasOwnProperty('id') ) {
+    throw new Error('Expected an "id" property.');
+  }
+
   return {
+    id: instance.id,
+    type: instance.constructor.singular,
     attributes: buildAttributes(instance),
     relationships: buildRelationships(instance),
   };

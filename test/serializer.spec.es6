@@ -43,22 +43,40 @@ describe('Serializer', () => {
       expect(JSON.parse(serialized)).to.be.an('object');
     });
 
+    it('should throw an error if no "id" is present on the instance', () => {
+      let instance = new Model({ name: 'test' });
+      let test = () => Serialize.toJSON(instance);
+      expect(test).to.throw(Error, /"id"/);
+    });
+
+    it('should have an "id" property at the top level', () => {
+      let instance = new Model({ name: 'test', id: '1' });
+      let serialized = Serialize.toJSON(instance);
+      expect(JSON.parse(serialized).data.id).to.equal('1');
+    });
+
+    it('should have a "type" property at the top level', () => {
+      let instance = new Model({ name: 'test', id: '1' });
+      let serialized = Serialize.toJSON(instance);
+      expect(JSON.parse(serialized).data.type).to.equal('test');
+    });
+
     it('should exclude non-schema properties from the result', () => {
-      let instance = new Model({ name: 'test', excluded: true });
+      let instance = new Model({ name: 'test', id: '1', excluded: true });
       let serialized = Serialize.toJSON(instance);
       expect(JSON.parse(serialized).data.attributes).to.not.have.property('excluded');
     });
 
     it('should exclude private properties from the result', () => {
-      let instance = new Model({ name: 'test', private: true });
+      let instance = new Model({ name: 'test', id: '1', private: true });
       let serialized = Serialize.toJSON(instance);
       expect(JSON.parse(serialized).data.attributes).to.not.have.property('private');
     });
 
     it('should serialize an array of instances', () => {
       let instances = [
-        new Model({ name: '1' }),
-        new Model({ name: '2' }),
+        new Model({ name: '1', id: '1' }),
+        new Model({ name: '2', id: '2' }),
       ];
       let serialized = Serialize.toJSON(instances);
       expect(JSON.parse(serialized).data).to.be.an('array');
