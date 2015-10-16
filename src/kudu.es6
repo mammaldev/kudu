@@ -36,6 +36,12 @@ export default class Kudu {
     // provided for it.
     this.router = new Router(this, config.router);
 
+    // Any extra data provided in the config object is just attached straight
+    // to the instance. This extra data can be anything that's useful to an app
+    // across e.g. route handlers and controllers. By attaching it to the Kudu
+    // instance application code doesn't have to worry about passing it around.
+    this.services = config.services || {};
+
     // Create a serializer and deserializer for this app. The defaults expect
     // to handle data in a format that complies with the JSON API spec.
     this.deserialize = deserialize.bind(null, this);

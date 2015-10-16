@@ -45,6 +45,15 @@ describe('Kudu', () => {
     expect(kudu.serialize).to.be.an('object');
   });
 
+  it('should expose "services" passed through the config', () => {
+    let kudu = new Kudu(null, {
+      services: {
+        test: 1,
+      },
+    });
+    expect(kudu.services).to.have.property('test', 1);
+  });
+
   describe('#createModel', () => {
 
     it('should throw an error if not passed a schema object', () => {
