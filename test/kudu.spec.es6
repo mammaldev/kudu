@@ -27,6 +27,16 @@ describe('Kudu', () => {
     expect(kudu.db).to.be.an.instanceOf(MemoryAdapter);
   });
 
+  it('should expose an instance of a custom adapter', () => {
+    let CustomAdapter = () => {};
+    let kudu = new Kudu(null, {
+      adapter: {
+        type: CustomAdapter,
+      },
+    });
+    expect(kudu.db).to.be.an.instanceOf(CustomAdapter);
+  });
+
   it('should expose a deserialize method', () => {
     expect(kudu.deserialize).to.be.a('function');
   });

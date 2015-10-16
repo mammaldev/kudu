@@ -16,7 +16,7 @@ export default class Kudu {
     // specified we default to built-in in-memory storage.
     if ( config.adapter && typeof config.adapter.type !== 'function' ) {
       throw new Error('Adapter config must include a "type" constructor.');
-    } else {
+    } else if ( !config.adapter ) {
       config.adapter = {
         type: MemoryAdapter,
       };
