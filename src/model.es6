@@ -82,4 +82,12 @@ export default class BaseModel {
       return this;
     });
   }
+
+  // Prepare a model instance for serialisation to a JSON string. JSON can't
+  // represent circular structures so we need to remove the reference to the
+  // Kudu app.
+  toJSON() {
+    delete this.app;
+    return this;
+  }
 }
