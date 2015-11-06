@@ -122,6 +122,14 @@ describe('Serializer', () => {
       });
     });
 
+    it('should return an object when the relevant flag is set', () => {
+      let error = new Error('test');
+      let serialized = Serialize.errorsToJSON(error, false);
+      expect(JSON.parse(JSON.stringify(serialized))).to.deep.equal({
+        errors: [ { detail: 'test' } ],
+      });
+    });
+
     it('should serialize an array of errors', () => {
       let errors = [
         new Error('test1'),

@@ -71,10 +71,17 @@ export default {
       status: error.status,
     }));
 
-    // Convert the new array into serialized JSON string.
-    return JSON.stringify({
+    // If the "stringify" flag was set we convert the new object into a
+    // serialized JSON string. Otherwise we just return the new object.
+    const response = {
       errors,
-    });
+    };
+
+    if ( stringify ) {
+      return JSON.stringify(response);
+    }
+
+    return response;
   },
 };
 
