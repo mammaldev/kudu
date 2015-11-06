@@ -249,4 +249,41 @@ export default class Router {
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
   }
+
+  // Register a route handler with Express.
+  //
+  // Arguments:
+  //   verb        {String}    The HTTP verb to which the route will respond.
+  //   path        {String}    The URL at which the route will be mounted.
+  //   [config]    {Object}    Optional options.
+  //
+  // Options:
+  //   prependBaseURL    {Boolean}    If false, don't prepend the configured
+  //                                  base URL path to the given path.
+  handle( verb, path, config, ...handlers ) {
+
+    let expressArgs;
+
+    // The config object is optional. If that parameter is a function then no
+    // config has been provided. Express exposes methods corresponding to HTTP
+    // verbs. The router exposes a single method and expects the verb as an
+    // argument. We slice off the verb, path and options, if present, and pass
+    // the rest of the arguments through.
+    if ( typeof config === 'function' ) {
+      expressArgs = [].slice.call(arguments, 2);
+      config = {};
+    } else {
+      expressArgs = [].slice.call(arguments, 3);
+    }
+
+    // If the router has been configured with a base URL we prepend it to the
+    // path, except in the case when the config for this route explictly says
+    // not to.
+    if ( config.prependBaseURL !== false ) {
+      path = this.config.baseURL + path;
+    }
+
+    expressArgs.unshift(path);
+    this.kudu.app[ verb.toLowerCase() ].apply(this.kudu.app, expressArgs);
+  }
 }

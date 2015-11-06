@@ -244,4 +244,25 @@ describe('Router', () => {
       .catch(( err ) => done(err));
     });
   });
+
+  describe('#handle', () => {
+
+    it('should ignore the base path when given the relevant option', ( done ) => {
+
+      let expressApp = express();
+      let app = new Kudu(expressApp, {
+        router: {
+          baseURL: '/api',
+        },
+      });
+      let request = supertest(expressApp);
+
+      app.router.handle('GET', '/handle', {
+        prependBaseURL: false,
+      }, ( req, res ) => res.status(200).end());
+
+      request.get('/handle')
+      .expect(200, done);
+    });
+  });
 });
