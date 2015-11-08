@@ -60,5 +60,13 @@ export default ( app = null, obj = null, type = null, requireId = true ) => {
     throw err;
   }
 
-  return new Model(data.attributes);
+  let instance = new Model(data.attributes);
+
+  // Add the type andi dentifier to the instance. The JSON API specification
+  // prohibits the use of "id" or "type" in attribute objects so this shouldn't
+  // cause any conflicts.
+  instance.type = data.type;
+  instance.id = data.id;
+
+  return instance;
 };

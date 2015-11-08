@@ -78,4 +78,20 @@ describe('Deserializer', () => {
     let deserialized = deserialize(kudu, obj, 'test');
     expect(deserialized).to.have.property('prop', 'test');
   });
+
+  it('should copy the "type" property onto the Kudu model instance', () => {
+    let obj = {
+      data: { type: 'test', id: '1', attributes: { prop: 'test' } },
+    };
+    let deserialized = deserialize(kudu, obj, 'test');
+    expect(deserialized).to.have.property('type', 'test');
+  });
+
+  it('should copy the "id" property onto the Kudu model instance', () => {
+    let obj = {
+      data: { type: 'test', id: '1', attributes: { prop: 'test' } },
+    };
+    let deserialized = deserialize(kudu, obj, 'test');
+    expect(deserialized).to.have.property('id', '1');
+  });
 });
