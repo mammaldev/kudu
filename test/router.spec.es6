@@ -45,6 +45,19 @@ describe('Router', () => {
         },
       },
     });
+    let Shadow = app.createModel('shadow', {
+      properties: {
+        name: {
+          type: String,
+        },
+      },
+    });
+    expressApp.post('/shadows', ( req, res, next ) => {
+      req.instance = new Shadow({
+        name: 'shadowed',
+      });
+      next();
+    });
     app.createGenericRoutes();
     request = supertest(expressApp);
   });
@@ -82,6 +95,17 @@ describe('Router', () => {
           return done(err);
         }
         expect(res.body.data.attributes).to.have.property('name', 'test');
+        done();
+      });
+    });
+
+    it('should allow prior route handlers to deserialize the instance', ( done ) => {
+      request.post('/shadows').send().expect(201)
+      .end(( err, res ) => {
+        if ( err ) {
+          return done(err);
+        }
+        expect(res.body.data.attributes).to.have.property('name', 'shadowed');
         done();
       });
     });

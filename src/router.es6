@@ -58,27 +58,37 @@ export default class Router {
         return res.status(404).end();
       }
 
-      // Attempt to deserialize the request body into a Kudu model instance.
-      // Because the resource has been created on the client it is not required
-      // to have an "id" property hence the flag as the final argument.
       let instance;
 
-      try {
-        instance = kudu.deserialize(req.body, type, false);
-      } catch ( err ) {
+      // Custom route handlers that run before this generic handler are able to
+      // deserialize and manipulate the model instance. If they do so they
+      // should attach the resulting instance to the request object. If an
+      // instance is already available here we don't need to deserialize it.
+      if ( req.instance ) {
+        instance = req.instance;
+      } else {
 
-        let errors = kudu.serialize.errorsToJSON(err, false);
+        // If an instance was not already available on the request object we
+        // attempt to deserialize and instantiate the request body now. Because
+        // the resource has been created on the client it is not required to
+        // have an "id" property hence the flag as the final argument.
+        try {
+          instance = kudu.deserialize(req.body, type, false);
+        } catch ( err ) {
 
-        // The deserializer can throw errors with a suggested HTTP response
-        // status. If this error has one we send it to the client.
-        if ( typeof err.status === 'number' ) {
-          return res.status(err.status).json(errors);
+          let errors = kudu.serialize.errorsToJSON(err, false);
+
+          // The deserializer can throw errors with a suggested HTTP response
+          // status. If this error has one we send it to the client.
+          if ( typeof err.status === 'number' ) {
+            return res.status(err.status).json(errors);
+          }
+
+          // If the error thrown by the deserializer doesn't have a recommended
+          // status code attached to it we just use the generic 400 "Bad
+          // request" status.
+          return res.status(400).json(errors);
         }
-
-        // If the error thrown by the deserializer doesn't have a recommended
-        // status code attached to it we just use the generic 400 "Bad request"
-        // status.
-        return res.status(400).json(errors);
       }
 
       // Validate the model instance. If it doesn't conform to the schema an
