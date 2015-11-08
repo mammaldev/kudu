@@ -9,8 +9,10 @@ export default {
   //   stringify    {Boolean}         If set, return a JSON string. Otherwise,
   //                                  return a serializable subset of the model
   //                                  instance as an object.
+  //   wrap         {Boolean}         If set, return a JSON API compliant
+  //                                  primary data object.
   //
-  toJSON( instance = null, stringify = true ) {
+  toJSON( instance = null, stringify = true, wrap = true ) {
 
     // If we don't have an instance to serialize we just return null.
     if ( !instance ) {
@@ -22,7 +24,9 @@ export default {
     if ( Array.isArray(instance) ) {
 
       let toSerialize = {
-        data: instance.map(( instance ) => this.toJSON(instance, false)),
+        data: instance.map(( instance ) =>
+          this.toJSON(instance, false, false)
+        ),
       };
 
       return JSON.stringify(toSerialize);
@@ -32,12 +36,18 @@ export default {
     // resource object.
     let resource = buildResource(instance);
 
+    // If the "wrap" flag was set we need to wrap the resource in a JSON API
+    // primary data object.
+    if ( wrap ) {
+      resource = {
+        data: resource,
+      };
+    }
+
     // If the "stringify" flag was set we convert the new object into a
     // serialized JSON string. Otherwise we just return the new object.
     if ( stringify ) {
-      return JSON.stringify({
-        data: resource,
-      });
+      return JSON.stringify(resource);
     }
 
     return resource;
