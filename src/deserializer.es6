@@ -40,7 +40,7 @@ export default ( app = null, obj = null, type = null, requireId = true ) => {
   }
 
   if ( requireId && typeof data.id !== 'string' ) {
-    throw new Error('Expected "id" property to be strings.');
+    throw new Error('Expected "id" property to be a string.');
   }
 
   // Get the model constructor associated with the resource type. If there is
