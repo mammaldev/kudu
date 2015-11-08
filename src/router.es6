@@ -67,7 +67,7 @@ export default class Router {
         instance = kudu.deserialize(req.body, type, false);
       } catch ( err ) {
 
-        let errors = kudu.serialize.errorsToJSON(err);
+        let errors = kudu.serialize.errorsToJSON(err, false);
 
         // The deserializer can throw errors with a suggested HTTP response
         // status. If this error has one we send it to the client.
@@ -86,7 +86,7 @@ export default class Router {
       try {
         validate(instance);
       } catch ( err ) {
-        return res.status(400).json(kudu.serialize.errorsToJSON(err));
+        return res.status(400).json(kudu.serialize.errorsToJSON(err, false));
       }
 
       // Attempt to persist the newly created instance. By this point we can be
@@ -94,8 +94,12 @@ export default class Router {
       // caused by an adapter failure, meaning 500 "Internal server error" is
       // likely the most appropriate response.
       return instance.save()
-      .then(( instance ) => res.status(201).json(kudu.serialize.toJSON(instance)))
-      .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
+      .then(( instance ) =>
+        res.status(201).json(kudu.serialize.toJSON(instance, false))
+      )
+      .catch(( err ) =>
+        res.status(500).json(kudu.serialize.errorsToJSON(err, false))
+      );
     }
 
     function handleGet( req, res ) {

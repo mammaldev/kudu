@@ -68,7 +68,7 @@ describe('Router', () => {
     it('should respond with a serialized object containing errors', ( done ) => {
       request.post('/tests').send().expect(400)
       .end(( err, res ) => {
-        expect(JSON.parse(res.body)).to.have.property('errors').which.is.an('array');
+        expect(res.body).to.have.property('errors').which.is.an('array');
         done();
       });
     });
@@ -81,7 +81,7 @@ describe('Router', () => {
         if ( err ) {
           return done(err);
         }
-        expect(JSON.parse(res.body).data.attributes).to.have.property('name', 'test');
+        expect(res.body.data.attributes).to.have.property('name', 'test');
         done();
       });
     });
