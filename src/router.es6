@@ -105,7 +105,9 @@ export default class Router {
       // likely the most appropriate response.
       return instance.save()
       .then(( instance ) =>
-        res.status(201).json(kudu.serialize.toJSON(instance, false))
+        res.status(201).json(kudu.serialize.toJSON(instance,  {
+          stringify: false,
+        }))
       )
       .catch(( err ) =>
         res.status(500).json(kudu.serialize.errorsToJSON(err, false))

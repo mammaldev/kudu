@@ -1,8 +1,8 @@
+import serialize from 'kudu-serializer-jsonapi';
 import MemoryAdapter from './adapter';
 import BaseModel from './model';
 import Router from './router';
 import deserialize from './deserializer';
-import serialize from './serializer';
 
 export default class Kudu {
 

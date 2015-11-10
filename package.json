@@ -7,7 +7,9 @@
     "test": "mocha test/ -R spec --recursive --compilers es6:babel/register"
   },
   "main": "lib/kudu.js",
-  "dependencies": {},
+  "dependencies": {
+    "kudu-serializer-jsonapi": "^0.1.0"
+  },
   "devDependencies": {
     "babel": "^5.8.23",
     "babel-eslint": "^4.1.1",
