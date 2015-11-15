@@ -50,6 +50,45 @@ describe('Model', () => {
     });
   });
 
+  describe('static inherits', () => {
+
+    let Base;
+    let Model;
+
+    beforeEach(() => {
+      Base = kudu.createModel('base', {
+        properties: {
+          name: {
+            type: String,
+          },
+          test: {
+            type: Number,
+          },
+        },
+      });
+      Model = kudu.createModel('test', {
+        properties: {
+          test: {
+            type: String,
+          },
+        },
+      });
+      Model.inherits(Base);
+    });
+
+    it('should throw if no subclass constructor is provided', () => {
+      let test = () => Model.inherits();
+      expect(test).to.throw(Error, /constructor to inherit/);
+    });
+
+    it('should merge the superclass schema with the subclass schema', () => {
+      expect(Model.schema.properties).to.deep.equal({
+        name: { type: String },
+        test: { type: String },
+      });
+    });
+  });
+
   describe('instances', () => {
 
     let Model;

@@ -95,6 +95,20 @@ export default class Kudu {
         return kudu.db.get(singular, id);
       }
 
+      // Extend the schema of this model with that of another. The subclass
+      // takes precedence if the same property is defined on both schemas.
+      static inherits( ctor ) {
+
+        if ( ctor === undefined ) {
+          throw new Error('Expected a model constructor to inherit from.');
+        }
+
+        Model.schema.properties = Object.assign(
+          ctor.schema.properties,
+          Model.schema.properties
+        );
+      }
+
       constructor( data ) {
         super(kudu, data);
       }
