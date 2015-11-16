@@ -144,6 +144,25 @@ describe('Model', () => {
       return expect(instance.save()).to.eventually.have.property('name', 'test');
     });
 
+    it('should run an array of "create" hook functions', () => {
+      let Model = kudu.createModel('hookTest', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        hooks: {
+          onCreate: [
+            function () { this.name = 'test'; },
+            function () { this.name = 'new'; },
+          ],
+        },
+      });
+      let instance = new Model();
+      return expect(instance.save()).to.eventually.have.property('name', 'new');
+    });
+
     it('should fail when the model is invalid', () => {
       let instance = new Model();
       return expect(instance.save()).to.be.rejectedWith(Error, /required/);
@@ -209,6 +228,28 @@ describe('Model', () => {
       });
       return expect(instance.save().then(instance.update.bind(instance)))
         .to.eventually.have.property('name', 'new');
+    });
+
+    it('should run an "update" hook function', () => {
+      let Model = kudu.createModel('hookTest', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        hooks: {
+          onUpdate: [
+            function () { this.name = '1'; },
+            function () { this.name = '2'; },
+          ],
+        },
+      });
+      let instance = new Model({
+        name: 'test',
+      });
+      return expect(instance.save().then(instance.update.bind(instance)))
+        .to.eventually.have.property('name', '2');
     });
 
     it('should fail when the model is invalid', () => {

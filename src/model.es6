@@ -21,9 +21,13 @@ export default class BaseModel {
     // saving. This is useful for e.g. setting a "created at" timestamp. If a
     // "create" hook function has been defined for the model we invoke it now
     // before validating the instance.
-    const hooks = this.constructor.schema.hooks;
+    const hooks = this.constructor.schema.hooks || {};
 
-    if ( hooks && typeof hooks.onCreate === 'function' ) {
+    // If a hook is an array rather than a function we run all functions in
+    // the array in turn.
+    if ( Array.isArray(hooks.onCreate) ) {
+      hooks.onCreate.forEach(( hook ) => void hook.call(this));
+    } else if ( typeof hooks.onCreate === 'function' ) {
       hooks.onCreate.call(this);
     }
 
@@ -64,9 +68,13 @@ export default class BaseModel {
     // saving. This is useful for e.g. setting an "updated at" timestamp. If an
     // "update" hook function has been defined for the model we invoke it now
     // before validating the instance.
-    const hooks = this.constructor.schema.hooks;
+    const hooks = this.constructor.schema.hooks || {};
 
-    if ( hooks && typeof hooks.onUpdate === 'function' ) {
+    // If a hook is an array rather than a function we run all functions in
+    // the array in turn.
+    if ( Array.isArray(hooks.onUpdate) ) {
+      hooks.onUpdate.forEach(( hook ) => void hook.call(this));
+    } else if ( typeof hooks.onUpdate === 'function' ) {
       hooks.onUpdate.call(this);
     }
 
