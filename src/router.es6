@@ -51,10 +51,10 @@ export default class Router {
     function handlePost( req, res ) {
 
       const type = req.params.type;
-      const Model = kudu.modelsByPluralName.get(type);
+      const Model = getModel(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( Model === undefined ) {
+      if ( !Model ) {
         return res.status(404).end();
       }
 
@@ -117,10 +117,10 @@ export default class Router {
     function handleGet( req, res ) {
 
       const type = req.params.type;
-      const Model = kudu.modelsByPluralName.get(type);
+      const Model = getModel(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( Model === undefined ) {
+      if ( !Model ) {
         return res.status(404).end();
       }
 
@@ -150,10 +150,10 @@ export default class Router {
     function handlePatch( req, res ) {
 
       const type = req.params.type;
-      const Model = kudu.modelsByPluralName.get(type);
+      const Model = getModel(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( Model === undefined ) {
+      if ( !Model ) {
         return res.status(404).end();
       }
 
@@ -205,10 +205,10 @@ export default class Router {
     function handleDelete( req, res ) {
 
       const type = req.params.type;
-      const Model = kudu.modelsByPluralName.get(type);
+      const Model = getModel(type);
 
       // If the resource type is unknown we cannot go any further.
-      if ( Model === undefined ) {
+      if ( !Model ) {
         return res.status(404).end();
       }
 
@@ -236,9 +236,9 @@ export default class Router {
       const ancestorId = req.params.id;
 
       // If the ancestor resource type is unknown we cannot go any further.
-      const Ancestor = kudu.modelsByPluralName.get(ancestorType);
+      const Ancestor = getModel(ancestorType);
 
-      if ( Ancestor === undefined ) {
+      if ( !Ancestor ) {
         return res.status(404).end();
       }
 
@@ -251,9 +251,9 @@ export default class Router {
       }
 
       // If the descendant resource type is unknown we cannot go any further.
-      const Descendant = kudu.models.get(relationship.type);
+      const Descendant = getModel(relationship.type, false);
 
-      if ( Descendant === undefined ) {
+      if ( !Descendant ) {
         return res.status(404).end();
       }
 
@@ -263,6 +263,20 @@ export default class Router {
       return kudu.db.getRelated(ancestorType, ancestorId, relationship)
       .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)))
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
+    }
+
+    // Get a Kudu model constructor. If the model is not "requestable" it is
+    // not visible to the generic route handlers and attempts to access routes
+    // related to such a model should result in a 404.
+    function getModel( type, plural = true ) {
+
+      const Model = kudu[ plural ? 'modelsByPluralName' : 'models' ].get(type);
+
+      if ( !Model || !Model.schema || Model.schema.requestable === false ) {
+        return null;
+      }
+
+      return Model;
     }
   }
 

@@ -35,6 +35,7 @@ describe('Router', () => {
       relationships: {
         children: { type: 'child', key: 'parent', hasMany: true },
         unmodelled: { type: 'unmodelled', hasMany: true },
+        unrequestable: { type: 'unrequestable', key: 'unrequestable' },
       },
     });
     Child = app.createModel('child', {
@@ -43,6 +44,13 @@ describe('Router', () => {
           type: String,
           required: true,
         },
+      },
+    });
+    app.createModel('unrequestable', {
+      requestable: false,
+      properties: {},
+      relationships: {
+        children: { type: 'child', key: 'parent', hasMany: true },
       },
     });
     let Shadow = app.createModel('shadow', {
@@ -66,6 +74,10 @@ describe('Router', () => {
 
     it('should 404 when the URL does not correspond to a model', ( done ) => {
       request.post('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the model is unrequestable', ( done ) => {
+      request.post('/unrequestables').send().expect(404, done);
     });
 
     it('should 400 when the request body is an invalid model', ( done ) => {
@@ -115,6 +127,10 @@ describe('Router', () => {
 
     it('should 404 when the URL does not correspond to a model', ( done ) => {
       request.get('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the model is unrequestable', ( done ) => {
+      request.get('/unrequestables').send().expect(404, done);
     });
 
     it('should 404 when the identifier does not correspond to a model', ( done ) => {
@@ -177,6 +193,17 @@ describe('Router', () => {
       request.get('/tests/1/unmodelled').send().expect(404, done);
     });
 
+    it('should 404 when the ancestor is unrequestable', ( done ) => {
+      request.get('/unrequestables/1/children').send().expect(404, done);
+    });
+
+    it('should 404 when the descendant is unrequestable', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.get('/tests/1/unrequestable').send().expect(404, done);
+      });
+    });
+
     it('should 200 with the response', ( done ) => {
       Promise.all([
         new Model({ id: '1', name: 'test' }).save(),
@@ -201,6 +228,10 @@ describe('Router', () => {
 
     it('should 404 when the URL does not correspond to a model', ( done ) => {
       request.patch('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the model is unrequestable', ( done ) => {
+      request.patch('/unrequestables').send().expect(404, done);
     });
 
     it('should 404 when the identifier does not correspond to a model', ( done ) => {
@@ -254,6 +285,10 @@ describe('Router', () => {
 
     it('should 404 when the URL does not correspond to a model', ( done ) => {
       request.delete('/fail').send().expect(404, done);
+    });
+
+    it('should 404 when the model is unrequestable', ( done ) => {
+      request.delete('/unrequestables').send().expect(404, done);
     });
 
     it('should 404 when the identifier does not correspond to a model', ( done ) => {
