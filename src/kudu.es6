@@ -1,3 +1,4 @@
+import addStaticInherits from 'kudu-model-inherits-decorator';
 import deserialize from 'kudu-deserializer-jsonapi';
 import serialize from 'kudu-serializer-jsonapi';
 import MemoryAdapter from './adapter';
@@ -78,6 +79,7 @@ export default class Kudu {
 
     let kudu = this;
 
+    @addStaticInherits
     class Model extends BaseModel {
 
       static singular = singular
@@ -93,53 +95,6 @@ export default class Kudu {
         }
 
         return kudu.db.get(singular, id);
-      }
-
-      // Extend the schema of this model with that of another. The subclass
-      // takes precedence if the same property is defined on both schemas.
-      static inherits( ctor ) {
-
-        if ( ctor === undefined ) {
-          throw new Error('Expected a model constructor to inherit from.');
-        }
-
-        Model.schema.properties = Object.assign(
-          ctor.schema.properties,
-          Model.schema.properties
-        );
-
-        // Subclass model constructors also inherit hook functions. In cases
-        // where both sub and super constructor provide a function for the same
-        // event they are run consecutively, starting with those defined by the
-        // super constructor.
-        if ( ctor.schema.hooks ) {
-
-          // If the subclass constructor doesn't have any hooks defined we can
-          // just use the superclass hooks as-is. Otherwise we have to merge
-          // the two sets.
-          const hooks = Model.schema.hooks;
-
-          if ( !hooks ) {
-            Model.schema.hooks = ctor.schema.hooks;
-          } else {
-
-            Object.keys(ctor.schema.hooks).forEach(( hook ) => {
-
-              // Ensure both the sub/super constructor hooks are arrays. This
-              // makes it easier to combine them with simple concatenation.
-              let subHooks = ctor.schema.hooks[ hook ];
-              if ( !Array.isArray(subHooks) ) {
-                subHooks = [ subHooks ];
-              }
-
-              if ( !Array.isArray(hooks[ hook ]) ) {
-                hooks[ hook ] = [ hooks[ hook ] ];
-              }
-
-              hooks[ hook ] = hooks[ hook ].concat(subHooks);
-            });
-          }
-        }
       }
 
       constructor( data ) {

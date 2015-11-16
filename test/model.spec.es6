@@ -35,6 +35,11 @@ describe('Model', () => {
     expect(Model.schema).to.equal(schema);
   });
 
+  it('should decorate the constructor with a static "inherits" method', () => {
+    let Model = kudu.createModel('test', {});
+    expect(Model.inherits).to.be.a('function');
+  });
+
   describe('static get', () => {
 
     let Model;
@@ -47,75 +52,6 @@ describe('Model', () => {
 
     it('should fail when no identifier is provided', () => {
       return expect(Model.get()).to.be.rejectedWith(Error, /identifier/);
-    });
-  });
-
-  describe('static inherits', () => {
-
-    let Base;
-    let Model;
-
-    beforeEach(() => {
-      Base = kudu.createModel('base', {
-        properties: {
-          name: {
-            type: String,
-          },
-          test: {
-            type: Number,
-          },
-        },
-        hooks: {
-          onCreate() {
-            this.test = 1;
-          },
-        },
-      });
-      Model = kudu.createModel('test', {
-        properties: {
-          test: {
-            type: String,
-          },
-        },
-      });
-      Model.inherits(Base);
-    });
-
-    it('should throw if no subclass constructor is provided', () => {
-      let test = () => Model.inherits();
-      expect(test).to.throw(Error, /constructor to inherit/);
-    });
-
-    it('should merge the superclass schema with the subclass schema', () => {
-      expect(Model.schema.properties).to.deep.equal({
-        name: { type: String },
-        test: { type: String },
-      });
-    });
-
-    it('should add superclass hooks to the subclass when the subclass has none', () => {
-      expect(Model.schema.hooks).to.have.property('onCreate');
-    });
-
-    it('should merge the superclass and subclass hooks when both are defined', () => {
-      let Base = kudu.createModel('base', {
-        properties: {},
-        hooks: {
-          onCreate() {
-            this.sup = 1;
-          },
-        },
-      });
-      let Model = kudu.createModel('test', {
-        properties: {},
-        hooks: {
-          onCreate() {
-            this.sub = 1;
-          },
-        },
-      });
-      Model.inherits(Base);
-      expect(Model.schema.hooks.onCreate).to.be.an('array').and.have.length(2);
     });
   });
 
