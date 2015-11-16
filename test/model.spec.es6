@@ -65,6 +65,11 @@ describe('Model', () => {
             type: Number,
           },
         },
+        hooks: {
+          onCreate() {
+            this.test = 1;
+          },
+        },
       });
       Model = kudu.createModel('test', {
         properties: {
@@ -86,6 +91,31 @@ describe('Model', () => {
         name: { type: String },
         test: { type: String },
       });
+    });
+
+    it('should add superclass hooks to the subclass when the subclass has none', () => {
+      expect(Model.schema.hooks).to.have.property('onCreate');
+    });
+
+    it('should merge the superclass and subclass hooks when both are defined', () => {
+      let Base = kudu.createModel('base', {
+        properties: {},
+        hooks: {
+          onCreate() {
+            this.sup = 1;
+          },
+        },
+      });
+      let Model = kudu.createModel('test', {
+        properties: {},
+        hooks: {
+          onCreate() {
+            this.sub = 1;
+          },
+        },
+      });
+      Model.inherits(Base);
+      expect(Model.schema.hooks.onCreate).to.be.an('array').and.have.length(2);
     });
   });
 
