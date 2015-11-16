@@ -126,6 +126,24 @@ describe('Model', () => {
       expect(instance.save()).to.be.an.instanceOf(Promise);
     });
 
+    it('should run a "create" hook function', () => {
+      let Model = kudu.createModel('hookTest', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        hooks: {
+          onCreate() {
+            this.name = 'test';
+          },
+        },
+      });
+      let instance = new Model();
+      return expect(instance.save()).to.eventually.have.property('name', 'test');
+    });
+
     it('should fail when the model is invalid', () => {
       let instance = new Model();
       return expect(instance.save()).to.be.rejectedWith(Error, /required/);
@@ -170,6 +188,27 @@ describe('Model', () => {
 
     it('should return a promise', () => {
       expect(instance.update()).to.be.an.instanceOf(Promise);
+    });
+
+    it('should run an "update" hook function', () => {
+      let Model = kudu.createModel('hookTest', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        hooks: {
+          onUpdate() {
+            this.name = 'new';
+          },
+        },
+      });
+      let instance = new Model({
+        name: 'test',
+      });
+      return expect(instance.save().then(instance.update.bind(instance)))
+        .to.eventually.have.property('name', 'new');
     });
 
     it('should fail when the model is invalid', () => {

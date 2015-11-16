@@ -17,6 +17,16 @@ export default class BaseModel {
   // Kudu app.
   save() {
 
+    // Models can define a "create" hook which can modify the instance before
+    // saving. This is useful for e.g. setting a "created at" timestamp. If a
+    // "create" hook function has been defined for the model we invoke it now
+    // before validating the instance.
+    const hooks = this.constructor.schema.hooks;
+
+    if ( hooks && typeof hooks.onCreate === 'function' ) {
+      hooks.onCreate.call(this);
+    }
+
     // Attempt to validate the instance. We don't want to save invalid models.
     try {
       validate(this);
@@ -49,6 +59,16 @@ export default class BaseModel {
   // Update the model instance via the adapter configured for use with the Kudu
   // app.
   update() {
+
+    // Models can define an "update" hook which can modify the instance before
+    // saving. This is useful for e.g. setting an "updated at" timestamp. If an
+    // "update" hook function has been defined for the model we invoke it now
+    // before validating the instance.
+    const hooks = this.constructor.schema.hooks;
+
+    if ( hooks && typeof hooks.onUpdate === 'function' ) {
+      hooks.onUpdate.call(this);
+    }
 
     // Attempt to validate the instance. We don't want to save invalid models.
     try {
