@@ -144,7 +144,14 @@ export default class Router {
       // instances. If there are no instances for the given type an empty array
       // will be sent to the client.
       return kudu.db.getAll(Model.singular)
-      .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)));
+      .then(( result ) => {
+
+        const instances = result.rows.map(( row ) => new Model(row));
+        res.status(200).json(kudu.serialize.toJSON(instances, false));
+      })
+      .catch(( err ) =>
+        res.status(500).json(kudu.serialize.errorsToJSON(err, false))
+      );
     }
 
     function handlePatch( req, res ) {

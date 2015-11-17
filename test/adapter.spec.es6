@@ -65,14 +65,18 @@ describe('MemoryAdapter', () => {
     });
 
     it('should return an empty array when a type does not exist', () => {
-      return expect(adapter.getAll('test')).to.eventually.deep.equal([]);
+      return expect(adapter.getAll('test')).to.eventually.deep.equal({
+        rows: [],
+      });
     });
 
     it('should return an array of instances', () => {
       adapter.create({ type: 'test', id: 1 });
-      return expect(adapter.getAll('test')).to.eventually.deep.equal([
-        { type: 'test', id: 1 },
-      ]);
+      return expect(adapter.getAll('test')).to.eventually.deep.equal({
+        rows: [
+          { type: 'test', id: 1 },
+        ],
+      });
     });
   });
 

@@ -96,14 +96,18 @@ export default class MemoryAdapter {
     let modelStore = this.store.get(type);
 
     if ( !(modelStore instanceof Map) ) {
-      return Promise.resolve([]);
+      return Promise.resolve({
+        rows: [],
+      });
     }
 
     // Build an array containing all instances of the model. Creating an array
     // from a map results in an array in which each element is another array
     // representing a key-value pair from the map. We only care about the
     // values.
-    return Promise.resolve(Array.from(modelStore).map(( i ) => i[ 1 ]));
+    return Promise.resolve({
+      rows: Array.from(modelStore).map(( i ) => i[ 1 ]),
+    });
   }
 
   // Get a list of Kudu model instances by type and relation.
