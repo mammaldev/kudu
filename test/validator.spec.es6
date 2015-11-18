@@ -41,6 +41,10 @@ describe('Validator', () => {
     expect(test).not.to.throw(Error);
   });
 
+  it('should expose a custom error type', () => {
+    expect(kudu.validateInstance).to.have.property('Error');
+  });
+
   describe('Strings', () => {
 
     beforeEach(() => {
