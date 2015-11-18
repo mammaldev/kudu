@@ -1,6 +1,6 @@
 import chai from 'chai';
 import Kudu from '../src/kudu';
-import validate from '../src/validate';
+import validate from '../src/validator';
 
 let expect = chai.expect;
 
@@ -8,6 +8,7 @@ describe('Validator', () => {
 
   let kudu;
   let Model;
+  let validate;
 
   beforeEach(() => {
     kudu = new Kudu();
@@ -22,6 +23,7 @@ describe('Validator', () => {
         },
       },
     });
+    validate = kudu.validateInstance.bind(kudu);
   });
 
   it('should throw an error when a required property is not present', () => {

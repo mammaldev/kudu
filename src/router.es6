@@ -1,5 +1,3 @@
-import validate from './validate';
-
 export default class Router {
 
   constructor( kudu, config = {} ) {
@@ -94,7 +92,7 @@ export default class Router {
       // Validate the model instance. If it doesn't conform to the schema an
       // error will be thrown.
       try {
-        validate(instance);
+        kudu.validateInstance(instance);
       } catch ( err ) {
         return res.status(400).json(kudu.serialize.errorsToJSON(err, false));
       }

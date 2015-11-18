@@ -54,6 +54,10 @@ describe('Kudu', () => {
     expect(kudu.services).to.have.property('test', 1);
   });
 
+  it('should expose a model validator function', () => {
+    expect(kudu.validateInstance).to.be.a('function');
+  });
+
   describe('#createModel', () => {
 
     it('should throw an error if not passed a schema object', () => {

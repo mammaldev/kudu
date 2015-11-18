@@ -1,5 +1,3 @@
-import validate from './validate';
-
 export default class BaseModel {
 
   constructor( app, data = {} ) {
@@ -33,7 +31,7 @@ export default class BaseModel {
 
     // Attempt to validate the instance. We don't want to save invalid models.
     try {
-      validate(this);
+      this.app.validateInstance(this);
     } catch ( err ) {
       return Promise.reject(err);
     }
@@ -80,7 +78,7 @@ export default class BaseModel {
 
     // Attempt to validate the instance. We don't want to save invalid models.
     try {
-      validate(this);
+      this.app.validateInstance(this);
     } catch ( err ) {
       return Promise.reject(err);
     }

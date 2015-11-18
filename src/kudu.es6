@@ -2,6 +2,7 @@ import addStaticInherits from 'kudu-model-inherits-decorator';
 import deserialize from 'kudu-deserializer-jsonapi';
 import serialize from 'kudu-serializer-jsonapi';
 import MemoryAdapter from './adapter';
+import validator from './validator';
 import BaseModel from './model';
 import Router from './router';
 
@@ -32,6 +33,9 @@ export default class Kudu {
     // plural name we have two stores, each keyed by one form.
     this.models = new Map();
     this.modelsByPluralName = new Map();
+
+    // Create a model validator for this app.
+    this.validateInstance = validator(this);
 
     // Create a Router instance for this app, passing through any configuration
     // provided for it.
