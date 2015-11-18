@@ -21,6 +21,9 @@ describe('Validator', () => {
         test: {
           type: String,
         },
+        linked: {
+          link: 'test',
+        },
       },
     });
     validate = kudu.validateInstance.bind(kudu);
@@ -157,6 +160,21 @@ describe('Validator', () => {
 
     it('should not throw an error when a property is an object', () => {
       let instance = new Model({ name: {} });
+      let test = () => validate(instance);
+      expect(test).not.to.throw();
+    });
+  });
+
+  describe('links', () => {
+
+    it('should throw an error when a property is not of the correct type', () => {
+      let instance = new Model({ name: 'test', linked: '1' });
+      let test = () => validate(instance);
+      expect(test).to.throw(Error, /instance/);
+    });
+
+    it('should not throw an error when a property is of the correct type', () => {
+      let instance = new Model({ name: 'test', linked: new Model() });
       let test = () => validate(instance);
       expect(test).not.to.throw();
     });

@@ -59,6 +59,19 @@ export default function validator( kudu ) {
         }
         break;
       }
+
+      // If the schema defines a property as a "link" the corresponding property
+      // on the instance must be another Kudu model instance of the type
+      // specified by the link.
+      if ( rule.link ) {
+
+        const ctor = kudu.getModel(rule.link);
+        if ( !( value instanceof ctor ) ) {
+          throw new Error(
+            `Property '${ prop }' must be a '${ rule.link }' instance.`
+          );
+        }
+      }
     });
 
     // If the model instance conforms to the schema we will reach this point
