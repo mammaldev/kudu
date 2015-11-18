@@ -89,14 +89,6 @@ export default class Router {
         }
       }
 
-      // Validate the model instance. If it doesn't conform to the schema an
-      // error will be thrown.
-      try {
-        kudu.validateInstance(instance);
-      } catch ( err ) {
-        return res.status(400).json(kudu.serialize.errorsToJSON(err, false));
-      }
-
       // Attempt to persist the newly created instance. By this point we can be
       // confident that the instance is valid so any errors are likely to be
       // caused by an adapter failure, meaning 500 "Internal server error" is
@@ -107,9 +99,20 @@ export default class Router {
           stringify: false,
         }))
       )
-      .catch(( err ) =>
-        res.status(500).json(kudu.serialize.errorsToJSON(err, false))
-      );
+      .catch(( err ) => {
+
+        // If the error came from the model instance validator we can tell the
+        // client that something was wrong with the data it sent.
+        const response = kudu.serialize.errorsToJSON(err, false);
+
+        if ( err instanceof kudu.validateInstance.Error ) {
+          return res.status(400).json(response);
+        }
+
+        // If ther error didn't come from the validator we respond with a
+        // generic 500 status.
+        res.status(500).json(response);
+      });
     }
 
     function handleGet( req, res ) {
