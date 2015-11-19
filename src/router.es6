@@ -137,7 +137,9 @@ export default class Router {
             return res.status(404).end();
           }
 
-          res.status(200).json(kudu.serialize.toJSON(instance));
+          res.status(200).json(kudu.serialize.toJSON(instance, {
+            stringify: false,
+          }));
         });
       }
 
@@ -148,7 +150,9 @@ export default class Router {
       .then(( result ) => {
 
         const instances = result.rows.map(( row ) => new Model(row));
-        res.status(200).json(kudu.serialize.toJSON(instances, false));
+        res.status(200).json(kudu.serialize.toJSON(instances, {
+          stringify: false,
+        }));
       })
       .catch(( err ) =>
         res.status(500).json(kudu.serialize.errorsToJSON(err, false))
@@ -206,7 +210,9 @@ export default class Router {
 
         return instance.update();
       })
-      .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated)))
+      .then(( updated ) => res.status(200).json(kudu.serialize.toJSON(updated, {
+        stringify: false,
+      })))
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
 
@@ -269,7 +275,9 @@ export default class Router {
       relationship.key = relationship.key || descendantType;
 
       return kudu.db.getRelated(ancestorType, ancestorId, relationship)
-      .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr)))
+      .then(( arr ) => res.status(200).json(kudu.serialize.toJSON(arr, {
+        stringify: false,
+      })))
       .catch(( err ) => res.status(500).json(kudu.serialize.errorsToJSON(err)));
     }
 
