@@ -121,6 +121,36 @@ describe('Router', () => {
         done();
       });
     });
+
+    it('should return includes based on the query string', ( done ) => {
+      Promise.all([
+        new Child({ id: '1', name: 'test' }).save(),
+        new Child({ id: '2', name: 'test' }).save(),
+      ])
+      .then(() => {
+        request.post('/tests?include=children').send({
+          data: {
+            type: 'test',
+            attributes: { name: 'test' },
+            relationships: {
+              children: {
+                data: [
+                  { type: 'child', id: '1' },
+                  { type: 'child', id: '2' },
+                ],
+              },
+            },
+          },
+        }).expect(201)
+        .end(( err, res ) => {
+          if ( err ) {
+            return done(err);
+          }
+          expect(res.body.included).to.be.an('array').and.have.length(2);
+          done();
+        });
+      });
+    });
   });
 
   describe('generic GET handler', () => {
@@ -176,6 +206,42 @@ describe('Router', () => {
         expect(res.body.data).to.be.an('array').and.to.have.length(0);
         done();
       });
+    });
+
+    it('should include "includes" when the relevant parameter is present', ( done ) => {
+      Promise.all([
+        new Child({ id: '1', name: 'test' }).save(),
+        new Model({ id: '2', name: 'test', children: [ '1' ] }).save(),
+      ])
+      .then(() => {
+        request.get('/tests/2?include=children').send().expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(res.body.included).to.be.an('array').and.have.length(1);
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
+    });
+
+    it('should include "includes" for all instances when the relevant parameter is present', ( done ) => {
+      Promise.all([
+        new Child({ id: '1', name: 'test' }).save(),
+        new Model({ id: '2', name: 'test', children: [ '1' ] }).save(),
+      ])
+      .then(() => {
+        request.get('/tests?include=children').send().expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(res.body.included).to.be.an('array').and.have.length(1);
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
     });
   });
 

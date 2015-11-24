@@ -94,6 +94,7 @@ export default class Router {
       // caused by an adapter failure, meaning 500 "Internal server error" is
       // likely the most appropriate response.
       return instance.save()
+      .then(( instance ) => link(instance, req.query))
       .then(( instance ) =>
         res.status(201).json(kudu.serialize.toJSON(instance,  {
           stringify: false,
@@ -131,6 +132,7 @@ export default class Router {
 
       if ( id ) {
         return kudu.db.get(Model.singular, id)
+        .then(( instance ) => link(instance, req.query))
         .then(( instance ) => {
 
           if ( !instance ) {
@@ -150,9 +152,12 @@ export default class Router {
       // instances. If there are no instances for the given type an empty array
       // will be sent to the client.
       return kudu.db.getAll(Model.singular)
-      .then(( result ) => {
+      .then(( result ) => result.rows.map(( row ) => new Model(row)))
+      .then(( instances ) => Promise.all(
+        instances.map(( instance ) => link(instance, req.query))
+      ))
+      .then(( instances ) => {
 
-        const instances = result.rows.map(( row ) => new Model(row));
         res.status(200).json(kudu.serialize.toJSON(instances, {
           stringify: false,
         }));
@@ -296,6 +301,23 @@ export default class Router {
       }
 
       return Model;
+    }
+
+    // Link any requested "includes" into a model instance.
+    function link( instance, qs = {} ) {
+
+      // If no instance is provided we just resolve with nothing.
+      if ( !instance ) {
+        return Promise.resolve(instance);
+      }
+
+      // Get the relationships the client has asked to be included.
+      let requestedIncludes = [];
+      if ( qs.include ) {
+        requestedIncludes = qs.include.split(',');
+      }
+
+      return instance.link(requestedIncludes);
     }
   }
 
