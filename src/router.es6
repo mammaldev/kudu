@@ -96,7 +96,7 @@ export default class Router {
       return instance.save()
       .then(( instance ) => link(instance, req.query))
       .then(( instance ) =>
-        res.status(201).json(kudu.serialize.toJSON(instance,  {
+        res.status(201).json(kudu.serialize.toJSON(instance, {
           stringify: false,
         }))
       )
