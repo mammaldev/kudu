@@ -48,11 +48,12 @@ export default class MemoryAdapter {
     return Promise.resolve(instance);
   }
 
-  // Get a specific Kudu model instance by unique identifier.
+  // Get a specific Kudu model instance by unique identifier, or an array of
+  // Kudu model instances by unique identifiers.
   //
   // Arguments:
   //   type    {String}           The type of the model to be retrieved.
-  //   id      {Number|String}    The unique identifer of a model instance to
+  //   id      {Array|String}     The unique identifer of a model instance to
   //                              be retrieved.
   //
   get( type, id ) {
@@ -68,15 +69,19 @@ export default class MemoryAdapter {
 
     // If a store for the requested model type doesn't exist then the specific
     // instance can't exist either so we return nothing.
+    const isArray = Array.isArray(id);
     let modelStore = this.store.get(type);
 
     if ( !(modelStore instanceof Map) ) {
-      return Promise.resolve();
+      return Promise.resolve(isArray ? [] : undefined);
     }
 
     // Get the requested instance from the model store. If it exists we return
     // it but if not we just return nothing.
-    return Promise.resolve(modelStore.get(id));
+    return Promise.resolve(isArray ?
+      id.map(( id ) => modelStore.get(id)) :
+      modelStore.get(id)
+    );
   }
 
   // Get a list of Kudu model instances by type.

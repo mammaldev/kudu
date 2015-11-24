@@ -56,6 +56,15 @@ describe('MemoryAdapter', () => {
       adapter.create({ type: 'test', id: 1 });
       return expect(adapter.get('test', 1)).to.eventually.have.property('id', 1);
     });
+
+    it('should return an array when an array of identifiers are found', () => {
+      adapter.create({ type: 'test', id: 1 });
+      adapter.create({ type: 'test', id: 2 });
+      return expect(adapter.get('test', [ 1, 2 ])).to.become([
+        { type: 'test', id: 1 },
+        { type: 'test', id: 2 },
+      ]);
+    });
   });
 
   describe('#getAll', () => {
