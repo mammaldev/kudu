@@ -345,5 +345,10 @@ describe('Model', () => {
     it('should allow serialisation of the resulting object', () => {
       expect(JSON.stringify(instance.toJSON())).to.be.a('string');
     });
+
+    it('should not affect the original instance', () => {
+      instance.toJSON();
+      expect(instance).to.have.property('app');
+    });
   });
 });

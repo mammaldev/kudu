@@ -133,7 +133,8 @@ export default class BaseModel {
   // represent circular structures so we need to remove the reference to the
   // Kudu app.
   toJSON() {
-    delete this.app;
-    return this;
+    const obj = Object.assign({}, this);
+    delete obj.app;
+    return obj;
   }
 }
