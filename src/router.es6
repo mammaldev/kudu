@@ -140,7 +140,10 @@ export default class Router {
           res.status(200).json(kudu.serialize.toJSON(instance, {
             stringify: false,
           }));
-        });
+        })
+        .catch(( err ) =>
+          res.status(500).json(kudu.serialize.errorsToJSON(err, false))
+        );
       }
 
       // If no identifier was present we need to retrieve an array of all
