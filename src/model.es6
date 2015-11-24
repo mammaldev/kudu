@@ -109,6 +109,26 @@ export default class BaseModel {
     });
   }
 
+  // Get other model instances related to this one and attach them to it based
+  // on the relationships configured in its schema.
+  link( relations ) {
+
+    const relationships = this.constructor.schema.relationships;
+
+    if ( !Array.isArray(relations) ) {
+      relations = [ relations ];
+    }
+
+    return Promise.all(relations.map(( rel ) =>
+      this.app.db.get(relationships[ rel ].type, this[ rel ]))
+    )
+    .then(( relatives ) => {
+
+      relatives.forEach(( relative, i ) => this[ relations[ i ] ] = relative);
+      return this;
+    });
+  }
+
   // Prepare a model instance for serialisation to a JSON string. JSON can't
   // represent circular structures so we need to remove the reference to the
   // Kudu app.

@@ -254,6 +254,73 @@ describe('Model', () => {
     });
   });
 
+  describe('#link', () => {
+
+    let Model;
+    let Child;
+    let Child2;
+
+    beforeEach(() => {
+      Child = kudu.createModel('child', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+      });
+      Child2 = kudu.createModel('child2', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+      });
+      Model = kudu.createModel('test', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        relationships: {
+          children: { type: 'child', hasMany: true },
+          child: { type: 'child2' },
+        },
+      });
+    });
+
+    it('should return a promise', () => {
+      let instance = new Model({ type: 'test', name: 'test', children: [ '1' ] });
+      expect(instance.link('children')).to.be.an.instanceOf(Promise);
+    });
+
+    it('should resolve to the instance', () => {
+      let instance = new Model({ type: 'test', name: 'test', children: [ '1' ] });
+      return expect(instance.link('children')).to.become(instance);
+    });
+
+    it('should attach a related model instance to the instance', () => {
+      return new Child2({ id: '1', name: 'test' }).save()
+      .then(() => {
+
+        let instance = new Model({ type: 'test', name: 'test', child: '1' });
+        return instance.link('child').then(( instance ) => {
+          expect(instance.child).to.be.an.instanceOf(Child2);
+        });
+      });
+    });
+
+    it('should attach an array of related model instances to the instance', () => {
+      new Child({ id: '1', name: 'test' }).save();
+      let instance = new Model({ type: 'test', name: 'test', children: [ '1' ] });
+      return instance.link('children').then(( instance ) => {
+        expect(instance.children[ 0 ]).to.be.an.instanceOf(Child);
+      });
+    });
+  });
+
   describe('#toJSON', () => {
 
     let Model;
