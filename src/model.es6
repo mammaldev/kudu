@@ -119,9 +119,21 @@ export default class BaseModel {
       relations = [ relations ];
     }
 
-    return Promise.all(relations.map(( rel ) =>
-      this.app.db.get(relationships[ rel ].type, this[ rel ]))
-    )
+    // For each relation get the related identifiers. If the relevant property
+    // on the instance already appears to be linked we just leave it as it is.
+    //
+    // TODO: Determine if ignoring already-linked resources is the right thing
+    // to do. It could be that you want to get a new updated version from the
+    // adapter.
+    return Promise.all(relations.map(( rel ) => {
+
+      const value = this[ rel ];
+      if ( value instanceof BaseModel ) {
+        return Promise.resolve(value);
+      }
+
+      return this.app.db.get(relationships[ rel ].type, value);
+    }))
     .then(( relatives ) => {
 
       relatives.forEach(( relative, i ) => this[ relations[ i ] ] = relative);
