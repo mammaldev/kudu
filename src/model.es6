@@ -151,7 +151,18 @@ export default class BaseModel {
     }))
     .then(( relatives ) => {
 
-      relatives.forEach(( relative, i ) => this[ relations[ i ] ] = relative);
+      relatives.forEach(( relative, i ) => {
+
+        const Model = this.app.getModel(relationships[ relations[ i ] ].type);
+        const key = relations[ i ];
+
+        if ( relative.rows ) {
+          this[ key ] = relative.rows.map(( item ) => new Model(item));
+        } else {
+          this[ key ] = new Model(relative);
+        }
+      });
+
       return this;
     });
   }
