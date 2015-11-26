@@ -73,13 +73,13 @@ export default class MemoryAdapter {
     let modelStore = this.store.get(type);
 
     if ( !(modelStore instanceof Map) ) {
-      return Promise.resolve(isArray ? [] : undefined);
+      return Promise.resolve(isArray ? { rows: [] } : undefined);
     }
 
     // Get the requested instance from the model store. If it exists we return
     // it but if not we just return nothing.
     return Promise.resolve(isArray ?
-      id.map(( id ) => modelStore.get(id)) :
+      { rows: id.map(( id ) => modelStore.get(id)) } :
       modelStore.get(id)
     );
   }
