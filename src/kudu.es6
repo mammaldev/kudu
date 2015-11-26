@@ -26,7 +26,7 @@ export default class Kudu {
 
     // Instantiate the adapter, passing through any options specified for it
     // and expose the instance on the Kudu app.
-    this.db = new config.adapter.type(config.adapter.config);
+    this.db = new config.adapter.type(this, config.adapter.config);
 
     // Create the model store. All models created for this app will be
     // referenced from this object. Since models have both a singular and
