@@ -132,7 +132,22 @@ export default class BaseModel {
         return Promise.resolve(value);
       }
 
-      return this.app.db.get(relationships[ rel ].type, value);
+      // An "inverse" relationship means the related instance stores the link.
+      // For example an "article" model may have a one-to-many relationship with
+      // a "comment" model. If the "comment" model stores the link in a "post"
+      // property and the "post" model does not maintain a list of "comments"
+      // the "post" model should define an inverse relationship to "comment" and
+      // the "comment" model should define a normal (non-inverse) relationship
+      // to "post".
+      const relationship = relationships[ rel ];
+
+      if ( relationship.inverse ) {
+        return this.app.db.getRelated(
+          this.constructor.singular, this.id, relationship
+        );
+      }
+
+      return this.app.db.get(relationship.type, value);
     }))
     .then(( relatives ) => {
 

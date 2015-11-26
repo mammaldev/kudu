@@ -259,6 +259,7 @@ describe('Model', () => {
     let Model;
     let Child;
     let Child2;
+    let Inverse;
 
     beforeEach(() => {
       Child = kudu.createModel('child', {
@@ -277,6 +278,17 @@ describe('Model', () => {
           },
         },
       });
+      Inverse = kudu.createModel('inverse', {
+        properties: {
+          name: {
+            type: String,
+            required: true,
+          },
+        },
+        relationships: {
+          test: { type: 'test' },
+        },
+      });
       Model = kudu.createModel('test', {
         properties: {
           name: {
@@ -287,6 +299,7 @@ describe('Model', () => {
         relationships: {
           children: { type: 'child', hasMany: true },
           child: { type: 'child2' },
+          inverses: { type: 'inverse', hasMany: true, inverse: 'test' },
         },
       });
     });
@@ -317,6 +330,14 @@ describe('Model', () => {
       let instance = new Model({ type: 'test', name: 'test', children: [ '1' ] });
       return instance.link('children').then(( instance ) => {
         expect(instance.children[ 0 ]).to.be.an.instanceOf(Child);
+      });
+    });
+
+    it('should attach inverse-related instances to the instance', () => {
+      let instance = new Model({ id: '1', name: 'test' });
+      new Inverse({ id: '2', test: '1', name: 'inverse' }).save();
+      return instance.link('inverses').then(( instance ) => {
+        expect(instance.inverses[ 0 ]).to.be.an.instanceOf(Inverse);
       });
     });
   });

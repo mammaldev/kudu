@@ -170,7 +170,7 @@ export default class MemoryAdapter {
     // If the relationship is to-one we return the first matching instance.
     let all = Array.from(relatedStore).map(( i ) => i[ 1 ]);
     let relations = all.filter(( i ) => {
-      return i[ relationship.key ] === ancestorId;
+      return i[ relationship.inverse ] === ancestorId;
     });
 
     return Promise.resolve(relationship.hasMany ? relations : relations[ 0 ]);

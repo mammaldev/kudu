@@ -114,7 +114,7 @@ describe('MemoryAdapter', () => {
       adapter.create({ type: 'child', id: '4', parent: '2' });
       return expect(adapter.getRelated('parent', '1', {
         type: 'child',
-        key: 'parent',
+        inverse: 'parent',
       })).to.eventually.become({ type: 'child', id: '3', parent: '1' });
     });
 
@@ -123,7 +123,7 @@ describe('MemoryAdapter', () => {
       adapter.create({ type: 'child', id: '1', parent: '2' });
       return expect(adapter.getRelated('parent', '1', {
         type: 'child',
-        key: 'parent',
+        inverse: 'parent',
       })).to.eventually.become(undefined);
     });
 
@@ -134,7 +134,7 @@ describe('MemoryAdapter', () => {
       adapter.create({ type: 'child', id: '4', parent: '2' });
       return expect(adapter.getRelated('parent', '1', {
         type: 'child',
-        key: 'parent',
+        inverse: 'parent',
         hasMany: true,
       })).to.eventually.become([ { type: 'child', id: '3', parent: '1' } ]);
     });
@@ -144,7 +144,7 @@ describe('MemoryAdapter', () => {
       adapter.create({ type: 'child', id: '3', parent: '2' });
       return expect(adapter.getRelated('parent', '1', {
         type: 'child',
-        key: 'parent',
+        inverse: 'parent',
         hasMany: true,
       })).to.eventually.become([]);
     });
