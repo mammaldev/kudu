@@ -1,6 +1,6 @@
 {
   "name": "kudu",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "lint": "eslint {src,test}/*.es6; true",
