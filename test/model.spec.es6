@@ -35,6 +35,12 @@ describe('Model', () => {
     expect(Model.schema).to.equal(schema);
   });
 
+  it('should default "relationships" to an empty object on the schema', () => {
+    let schema = {};
+    let Model = kudu.createModel('test', schema);
+    expect(Model.schema.relationships).to.deep.equal({});
+  });
+
   it('should decorate the constructor with a static "inherits" method', () => {
     let Model = kudu.createModel('test', {});
     expect(Model.inherits).to.be.a('function');

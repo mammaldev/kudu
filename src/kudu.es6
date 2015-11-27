@@ -81,6 +81,13 @@ export default class Kudu {
       throw new Error('No schema provided.');
     }
 
+    // If the schema does not define any relationships we add an empty object so
+    // other plugins don't have to worry about whether or not the key will exist
+    // on the schema.
+    if ( !schema.relationships ) {
+      schema.relationships = Object.create(null);
+    }
+
     let kudu = this;
 
     @addStaticInherits
