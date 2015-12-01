@@ -275,6 +275,10 @@ describe('Model', () => {
             required: true,
           },
         },
+        relationships: {
+          deep: { type: 'child2' },
+          deeps: { type: 'child2', hasMany: true },
+        },
       });
       Child2 = kudu.createModel('child2', {
         properties: {
@@ -344,6 +348,25 @@ describe('Model', () => {
       new Inverse({ id: '2', test: '1', name: 'inverse' }).save();
       return instance.link('inverses').then(( instance ) => {
         expect(instance.inverses[ 0 ]).to.be.an.instanceOf(Inverse);
+      });
+    });
+
+    it('should attach deeply nested instances', () => {
+      new Child2({ id: '1', name: 'deep' }).save();
+      new Child({ id: '2', name: 'child', deep: '1' }).save();
+      let instance = new Model({ type: 'test', name: 'test', children: [ '2' ] });
+      return instance.link('children.deep').then(( instance ) => {
+        expect(instance.children[ 0 ].deep).to.be.an.instanceOf(Child2);
+      });
+    });
+
+    it('should attach an array of deeply nested instances', () => {
+      new Child2({ id: '1', name: 'deep' }).save();
+      new Child2({ id: '2', name: 'deep2' }).save();
+      new Child({ id: '3', name: 'child', deeps: [ '1', '2' ] }).save();
+      let instance = new Model({ type: 'test', name: 'test', children: [ '3' ] });
+      return instance.link('children.deeps').then(( instance ) => {
+        expect(instance.children[ 0 ].deeps[ 1 ]).to.be.an.instanceOf(Child2);
       });
     });
   });

@@ -119,47 +119,176 @@ export default class BaseModel {
       relations = [ relations ];
     }
 
-    // For each relation get the related identifiers. If the relevant property
-    // on the instance already appears to be linked we just leave it as it is.
-    //
-    // TODO: Determine if ignoring already-linked resources is the right thing
-    // to do. It could be that you want to get a new updated version from the
-    // adapter.
-    return Promise.all(relations.map(( rel ) => {
+    const promises = relations.map(( relation ) => {
 
-      const value = this[ rel ];
-      if ( value instanceof BaseModel ) {
-        return Promise.resolve(value);
-      }
+      // A dot in the relation indicates that the client wants to retrieve
+      // deeply nested resources. We need to link the parts of the relation path
+      // in order so that the relevant object is in place when a deeply nested
+      // resource is linked.
+      const parts = relation.split('.');
+      let promise = Promise.resolve();
 
-      // An "inverse" relationship means the related instance stores the link.
-      // For example an "article" model may have a one-to-many relationship with
-      // a "comment" model. If the "comment" model stores the link in a "post"
-      // property and the "post" model does not maintain a list of "comments"
-      // the "post" model should define an inverse relationship to "comment" and
-      // the "comment" model should define a normal (non-inverse) relationship
-      // to "post".
-      const relationship = relationships[ rel ];
+      parts.forEach(( part, i ) => {
 
-      if ( relationship.inverse ) {
-        return this.app.db.getRelated(
-          this.constructor.singular, this.id, relationship
-        );
-      }
+        promise = promise.then(( data ) => {
 
-      return this.app.db.get(relationship.type, value);
-    }))
+          let obj = this;
+
+          // If the previous promise resolved with data we have a resource that
+          // needs to be linked. We determine the target object based on the
+          // current position of a pointer aiming at an index of the relation
+          // path parts array.
+          if ( data ) {
+
+            for ( let j = 1; j < parts.length; j++ ) {
+
+              if ( j >= i ) {
+                break;
+              }
+
+              // Update the target object by following the next part of the
+              // relation path. When the path part index pointer reaches the
+              // current part of the path the target object will not be updated
+              // as the previous break will execute.
+              obj = obj[ parts[ j ] ];
+            }
+
+            // Link the resource into the target object.
+            // TODO: Handle the case where the target object is an array.
+            const key = parts[ i - 1 ];
+
+            if ( data.rows && data.rows.length ) {
+
+              const Model = this.app.getModel(data.rows[ 0 ].type);
+              obj[ key ] = data.rows.map(( item ) => new Model(item));
+            } else if ( !data.rows ) {
+
+              const Model = this.app.getModel(data.type);
+              obj[ key ] = new Model(data);
+            } else {
+
+              return Promise.resolve();
+            }
+
+            obj = obj[ key ];
+          }
+
+          // Get the value of the target property. If there is more than one
+          // part to the relation path the target property can be on "this"
+          // instance of one of the already-linked relatives.
+          const key = parts[ i ];
+          let value = Array.isArray(obj) ? obj : obj[ key ];
+
+          if ( i && Array.isArray(value) ) {
+            value = value.map(( item ) => item[ part ]);
+          }
+
+          // If the value of the target property is already a model instance it
+          // does not need to be linked.
+          if ( value instanceof BaseModel ) {
+            return Promise.resolve(value);
+          }
+
+          // If linkage is necessary we need to get the relevant relationship
+          // object which tells us which type we need to find instances of.
+          const relationship = Array.isArray(obj) ?
+            obj[ 0 ].constructor.schema.relationships[ key ] :
+            obj.constructor.schema.relationships[ key ];
+
+          // An "inverse" relationship means the related instance stores the
+          // link. For example an "article" model may have a one-to-many
+          // relationship with a "comment" model. If the "comment" model stores
+          // the link in a "post" property and the "post" model does not
+          // maintain a list of "comments" the "post" model should define an
+          // inverse relationship to "comment" and the "comment" model should
+          // define a normal (non-inverse) relationship to "post".
+          if ( relationship.inverse ) {
+            return this.app.db.getRelated(
+              this.constructor.singular, this.id, relationship
+            );
+          }
+
+          // Handle relationships of the form "parent --(many)--> child
+          // --(many)--> grandchild". In this situation we should have an array
+          // (representing children) of arrays (representing grandchildren) of
+          // identifiers to fetch. We can't flatten the arrays (which could
+          // result in fewer calls to the adapter) because we need to match the
+          // results (arrays of grandchildren) to each child.
+          if ( Array.isArray(value) && Array.isArray(value[ 0 ]) ) {
+
+            return Promise.all(value.map(( value ) =>
+              this.app.db.get(relationship.type, value)
+            ));
+          }
+
+          // Handle relationships of the form "parent --(one)--> child".
+          return this.app.db.get(relationship.type, value);
+        });
+      });
+
+      return promise;
+    });
+
+    return Promise.all(promises)
     .then(( relatives ) => {
 
+      // Relatives should be an array of related instances with one element for
+      // each relation path passed to the method. Each element can either be a
+      // single related instance of an array.
       relatives.forEach(( relative, i ) => {
 
-        const Model = this.app.getModel(relationships[ relations[ i ] ].type);
-        const key = relations[ i ];
+        if ( !relative ) {
+          return;
+        }
 
-        if ( relative.rows ) {
-          this[ key ] = relative.rows.map(( item ) => new Model(item));
+        const parts = relations[ i ].split('.');
+        const key = parts[ parts.length - 1 ];
+        let obj = this;
+
+        // Find the target object. This is the object into which the current
+        // relative will be linked. Most commonly this will be this instance (
+        // when the relation path does not specify any nested relationships).
+        for ( let j = 0; j < parts.length - 1; j++ ) {
+          obj = obj[ parts[ j ] ];
+        }
+
+        // Get the relationship definition from the target object constructor
+        // and then get the constructor of the related type from the Kudu app.
+        const relationship = Array.isArray(obj) ?
+          obj[ 0 ].constructor.schema.relationships[ key ] :
+          obj.constructor.schema.relationships[ key ];
+
+        const Model = this.app.getModel(relationship.type);
+
+        // If the target is an array we need to link the related resource into
+        // each element of it.
+        if ( Array.isArray(obj) ) {
+
+          // If the related resource is also an array we need to match each
+          // element to the corresponding target object.
+          if ( Array.isArray(relative) ) {
+
+            obj.forEach(( item, i ) => {
+
+              const matchingRelative = relative[ i ];
+
+              item[ key ] = matchingRelative.rows ?
+                matchingRelative.rows.map(( item ) => new Model(item)) :
+                new Model(matchingRelative);
+            });
+          } else {
+
+            obj.forEach(( item, i ) => {
+              item[ key ] = new Model(relative.rows[ i ]);
+            });
+          }
         } else {
-          this[ key ] = new Model(relative);
+
+          // If the target is an object we need to link the related resource
+          // into it.
+          obj[ key ] = relative.rows ?
+            relative.rows.map(( item ) => new Model(item)) :
+            new Model(relative);
         }
       });
 
