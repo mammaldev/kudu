@@ -9,6 +9,7 @@
   "main": "lib/kudu.js",
   "dependencies": {
     "kudu-deserializer-jsonapi": "^0.2.0",
+    "kudu-model": "^0.1.0",
     "kudu-model-inherits-decorator": "^0.1.0",
     "kudu-serializer-jsonapi": "^0.1.0"
   },
