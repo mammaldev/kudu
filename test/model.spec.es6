@@ -64,9 +64,16 @@ describe('Model', () => {
   describe('instances', () => {
 
     let Model;
+    let Child;
 
     beforeEach(() => {
-      Model = kudu.createModel('test', {});
+      Child = kudu.createModel('child', {});
+      Model = kudu.createModel('test', {
+        relationships: {
+          child: { type: 'child' },
+          children: { type: 'child', hasMany: true },
+        },
+      });
     });
 
     it('should inherit from the base Model constructor', () => {
@@ -75,6 +82,16 @@ describe('Model', () => {
 
     it('should map provided data onto the instance', () => {
       expect(new Model({ id: 1 })).to.have.property('id', 1);
+    });
+
+    it('should handle nested model instances based on relationships', () => {
+      expect(new Model({ id: 1, child: { id: 2 } })).to.have.property('child')
+        .that.is.an.instanceOf(Child);
+    });
+
+    it('should handle arrays of nested instances based on relationships', () => {
+      let instance = new Model({ id: 1, children: [ { id: 2 } ] });
+      expect(instance.children[ 0 ]).to.be.an.instanceOf(Child);
     });
   });
 

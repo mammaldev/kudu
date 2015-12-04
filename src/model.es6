@@ -7,8 +7,46 @@ export default class BaseModel {
     this.app = app;
 
     // If an initial data object is provided to a model constructor the
-    // properties of that object are mapped onto the resulting instance.
-    Object.keys(data).forEach(( key ) => this[ key ] = data[ key ]);
+    // properties of that object are mapped onto the resulting instance. The
+    // relationships of the model are used to determine whether a particular key
+    // refers to a nested model instance. Any nested instances are recursively
+    // instantiated.
+    const relationships = this.constructor.schema.relationships;
+
+    Object.keys(data).forEach(( key ) => {
+
+      const relationship = relationships[ key ];
+      const value = data[ key ];
+      let NestedModel;
+
+      if (
+        relationship &&
+        ( NestedModel = app.getModel(relationship.type) ) &&
+        typeof value === 'object' &&
+        value
+      ) {
+
+        // If the initial data is an array we attempt to map it to an array of
+        // corresponding nested model instances. Otherwise it should be an
+        // object which can be instantiated itself.
+        if ( Array.isArray(value) ) {
+
+          this[ key ] = value.map(( item ) => {
+
+            if ( typeof item === 'object' && item ) {
+              return new NestedModel(item);
+            }
+
+            return item;
+          });
+        } else {
+          this[ key ] = new NestedModel(value);
+        }
+
+      } else {
+        this[ key ] = value;
+      }
+    });
   }
 
   // Persist the model instance via the adapter configured for use with the
