@@ -132,17 +132,19 @@ export default class Router {
 
       if ( id ) {
         return kudu.db.get(Model.singular, id)
-        .then(( instance ) => link(instance, req.query))
         .then(( instance ) => {
 
           if ( !instance ) {
             return res.status(404).end();
           }
 
+          return link(new Model(instance), req.query);
+        })
+        .then(( instance ) =>
           res.status(200).json(kudu.serialize.toJSON(instance, {
             stringify: false,
-          }));
-        })
+          }))
+        )
         .catch(( err ) =>
           res.status(500).json(kudu.serialize.errorsToJSON(err, false))
         );
