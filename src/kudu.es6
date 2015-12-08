@@ -120,6 +120,41 @@ export default class Kudu {
     return Model;
   }
 
+  // Instantiate models from initial data objects.
+  //
+  // TODO: Decide whether the name of this method should change. Is it too
+  // similar to `createModel` which does something very different.
+  //
+  // Arguments:
+  //
+  //   data    {Array|Object}    Data object or array of data objects with which
+  //                             model instances can be created.
+  //
+  createModels( data ) {
+
+    if ( !data ) {
+      throw new Error('Expected a data object but got undefined.');
+    }
+
+    // If we have an array of data objects we map it to an array of
+    // corresponding model instances.
+    if ( Array.isArray(data) ) {
+      return data.map(this.createModels.bind(this));
+    }
+
+    // If we have a single data object we create a single corresponding model
+    // instance.
+    const Model = this.getModel(data.type);
+
+    if ( Model ) {
+      return new Model(data);
+    }
+
+    // If a corresponding model constructor is not available we just return the
+    // data as-is.
+    return data;
+  }
+
   // Get a model constructor previously created with Kudu#createModel.
   //
   // Arguments:

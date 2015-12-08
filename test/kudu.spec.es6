@@ -84,6 +84,29 @@ describe('Kudu', () => {
     });
   });
 
+  describe('#createModels', () => {
+
+    it('should throw an error if not passed anything', () => {
+      let test = () => kudu.createModels();
+      expect(test).to.throw(Error, /data object/);
+    });
+
+    it('should return a model instance if passed a single data object', () => {
+      let Model = kudu.createModel('test', {});
+      expect(kudu.createModels({ type: 'test' })).to.be.an.instanceOf(Model);
+    });
+
+    it('should return an array of model instances if passed an array', () => {
+      let Model = kudu.createModel('test', {});
+      expect(kudu.createModels([ { type: 'test' } ])[ 0 ]).to.be.an.instanceOf(Model);
+    });
+
+    it('should return the data object if it doesn\'t correspond to a model', () => {
+      let data = {};
+      expect(kudu.createModels(data)).to.equal(data);
+    });
+  });
+
   describe('#getModel', () => {
 
     it('should return a model constructor from the model cache', () => {
