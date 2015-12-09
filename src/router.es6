@@ -38,6 +38,7 @@ export default class Router {
     kudu.app.post(genericURL, handlePost);
     kudu.app.get(genericURL, handleGet);
     kudu.app.get(specificURL, handleGet);
+    kudu.app.put(specificURL, handlePatch);
     kudu.app.patch(specificURL, handlePatch);
     kudu.app.delete(specificURL, handleDelete);
     kudu.app.get(descendantURL, handleDescendantGet);

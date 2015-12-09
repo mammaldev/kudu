@@ -345,6 +345,23 @@ describe('Router', () => {
       })
       .catch(( err ) => done(err));
     });
+
+    it('should work for PUT requests', ( done ) => {
+      new Model({ id: '1', name: 'test' }).save()
+      .then(() => {
+        request.put('/tests/1').send({
+          data: { type: 'test', id: '1', attributes: { name: 'new' } },
+        }).expect(200)
+        .end(( err, res ) => {
+          if ( err ) {
+            throw err;
+          }
+          expect(res.body.data.attributes).to.have.property('name', 'new');
+          done();
+        });
+      })
+      .catch(( err ) => done(err));
+    });
   });
 
   describe('generic DELETE handler', () => {
