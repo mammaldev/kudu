@@ -211,6 +211,8 @@ export default class Router {
           return res.status(404).end();
         }
 
+        instance = new Model(instance);
+
         // Merge the stored instance with the new instance. The JSON API spec
         // states that properties sent with a PATCH request should be used to
         // update the corresponding stored property and stored properties that
