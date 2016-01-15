@@ -93,9 +93,9 @@ export default class Kudu {
     @addStaticInherits
     class Model extends BaseModel {
 
-      static singular = singular
-      static plural = plural
-      static schema = schema
+      static singular = singular;
+      static plural = plural;
+      static schema = schema;
 
       // Find an instance of this model by unique identifier.
       static get( id ) {
