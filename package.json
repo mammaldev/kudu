@@ -6,6 +6,10 @@
     "lint": "eslint {src,test}/{**/*.es6,*.es6}; true",
     "test": "mocha test/ -R spec --recursive --compilers es6:babel/register"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mammaldev/kudu.git"
+  },
   "main": "lib/kudu.js",
   "dependencies": {
     "core-js": "^1.1.4",
